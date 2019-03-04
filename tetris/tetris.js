@@ -157,7 +157,7 @@ function piece(x, y, type) {
         var tempy = this.y2;
         var newx = this.x + this.y - tempy;
         var newy = this.y - this.x + tempx;
-        if(this.type == "square" || newx < 0 || newx > 9 || newy < 0 || newy > 19) {
+        if(this.type === "square" || newx < 0 || newx > 9 || newy < 0 || newy > 19) {
             return false;
         }
         tempx = this.x3;
