@@ -43,11 +43,9 @@ function game() {
 
   if(snake_x == apple_x && snake_y == apple_y) {
       tail_length++;
-      apple_x = Math.floor(Math.Random()*20);
-      apple_y = Math.floor(Math.Random()*20);
-      console.log("inside",apple_x,apple_y);
+      apple_x = Math.floor(Math.random()*20);
+      apple_y = Math.floor(Math.random()*20);
   }
-  console.log("outside",apple_x,apple_y);
   ctx.fillStyle = "red";
   ctx.fillRect(apple_x*px_len,apple_y*px_len,px_len,px_len);
 }
