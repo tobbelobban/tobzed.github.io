@@ -8,6 +8,7 @@ window.onload = function() {
 };
 
 snake_x = 9, snake_y = 9;
+apple_x = 12, apply_y = 12;
 x_vel = 0, y_vel = 0;
 player_size = 20;
 tail_length = 4;
@@ -42,20 +43,28 @@ function game() {
 function pushed_key(event) {
   switch(event.keyCode) {
     case 37:
-      x_vel = -1;
-      y_vel = 0;
+      if(x_vel != 1) {
+        x_vel = -1;
+        y_vel = 0;
+      }
       break;
     case 38:
-      x_vel = 0;
-      y_vel = -1;
+      if(y_vel != 1) {
+        x_vel = 0;
+        y_vel = -1;
+      }
       break;
     case 39:
-      x_vel = 1;
-      y_vel = 0;
+      if(x_vel != -1) {
+        x_vel = 1;
+        y_vel = 0;
+      }
       break;
     case 40:
-      x_vel = 0;
-      y_vel = 1;
+      if(y_vel != -1) {
+        x_vel = 0;
+        y_vel = 1;
+      }
       break;
   }
 }
