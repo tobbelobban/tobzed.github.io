@@ -11,7 +11,7 @@ snake_x = 9, snake_y = 9;
 apple_x = 12, apply_y = 12;
 x_vel = 0, y_vel = 0;
 player_size = 20;
-tail_length = 4;
+min_tail_length = 4;
 tail = [];
 edge_length = canvas.width / player_size; 
 
@@ -34,6 +34,7 @@ function game() {
     ctx.fillRect(tail[i].x*edge_length,tail[i].y*edge_length,player_size,player_size);
   }
   tail.push({x:snake_x,y:snake_y});
+  console.log(tail.length);
   if(tail.length > tail_length) {
     tail.shift();
   }
