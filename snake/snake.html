@@ -35,7 +35,7 @@ function game() {
   }
   tail.push({x:snake_x,y:snake_y});
   console.log(tail.length);
-  if(tail.length > tail_length) {
+  if(tail.length > min_tail_length) {
     tail.shift();
   }
   
