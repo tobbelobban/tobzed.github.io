@@ -31,7 +31,7 @@ function game() {
   ctx.fillRect(0,0,canvas.width,canvas.height);
   ctx.fillStyle = "orange";
   for(var i = 0; i < tail.length; i++) {
-    ctx.fillRect(tail[i].x*px_len,tail[i].y*px_len,px_len,px_len);
+    ctx.fillRect(tail[i].x*px_len,tail[i].y*px_len-1,px_len,px_len-1);
     if(snake_x == tail[i].x && snake_y == tail[i].y) {
         tail_length = 4;
     }
@@ -47,7 +47,7 @@ function game() {
       apple_y = Math.floor(Math.random()*20);
   }
   ctx.fillStyle = "red";
-  ctx.fillRect(apple_x*px_len,apple_y*px_len,px_len,px_len);
+  ctx.fillRect(apple_x*px_len,apple_y*px_len-1,px_len,px_len-1);
 }
 
 function pushed_key(event) {
