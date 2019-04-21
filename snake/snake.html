@@ -4,40 +4,37 @@ window.onload = function() {
   canvas = document.getElementById("canvas");
   ctx = canvas.getContext("2d");
   document.addEventListener("keydown", pushed_key);
-  setInterval(game,1000/10);
+  setInterval(game,1000/15);
 };
 
 snake_x = 9, snake_y = 9;
-apple_x = 12, apply_y = 12;
+apple_x = 12, apple_y = 12;
 x_vel = 0, y_vel = 0;
-player_size = 20;
-min_tail_length = 4;
+item_edge_length = 20;
+tail_length = 4;
 tail = [];
-edge_length = canvas.width / player_size; 
+tile_count = canvas.width / item_edge_length; 
 
 function game() {
   snake_x += x_vel;
   snake_y += y_vel;
   if(snake_x < 0) {
-    snake_x = edge_length - 1;
-  } else if(snake_x >= edge_length) {
+    snake_x = tile_count - 1;
+  } else if(snake_x >= tile_count) {
     snake_x = 0;
   } else if(snake_y < 0) {
-    snake_y = edge_length - 1;
-  } else if(snake_y >= edge_length) {
+    snake_y = tile_count - 1;
+  } else if(snake_y >= tile_count) {
     snake_y = 0;
   }
   ctx.fillStyle = "black";
   ctx.fillRect(0,0,canvas.width,canvas.height);
-  ctx.fillStyle = "orange";
+  ctx.fillStyle = "green";
   for(var i = 0; i < tail.length; i++) {
-    ctx.fillRect(tail[i].x*edge_length,tail[i].y*edge_length,player_size,player_size);
+    ctx.fillRect(tail[i].x*edge_length,tail[i].y*edge_length,item_edge_length,item_edge_length);
   }
   tail.push({x:snake_x,y:snake_y});
-  console.log(tail.length);
-  if(tail.length > min_tail_length) {
-    tail.shift();
-  }
+  tail.shift();
   
 }
 
