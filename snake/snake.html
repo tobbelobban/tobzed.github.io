@@ -29,11 +29,11 @@ function game() {
   ctx.fillStyle = "black";
   ctx.fillRect(0,0,canvas.width,canvas.height);
   ctx.fillStyle = "orange";
-  for(var i = 0; i < tail_length; i++) {
+  for(var i = 0; i < tail.length; i++) {
     ctx.fillRect(tail[i].x*edge_length,tail[i].y*edge_length,player_size,player_size);
   }
   tail.push({x:snake_x,y:snake_y});
-  if(tail.size() > tail_length) {
+  if(tail.length > tail_length) {
     tail.shift();
   }
   
