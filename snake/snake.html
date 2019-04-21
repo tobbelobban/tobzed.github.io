@@ -31,7 +31,7 @@ function game() {
   ctx.fillRect(0,0,canvas.width,canvas.height);
   ctx.fillStyle = "green";
   for(var i = 0; i < tail.length; i++) {
-    ctx.fillRect(tail[i].x*edge_length,tail[i].y*edge_length,item_edge_length,item_edge_length);
+    ctx.fillRect(tail[i].x*item_edge_length,tail[i].y*item_edge_length,item_edge_length,item_edge_length);
   }
   tail.push({x:snake_x,y:snake_y});
   tail.shift();
