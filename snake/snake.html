@@ -32,11 +32,22 @@ function game() {
   ctx.fillStyle = "orange";
   for(var i = 0; i < tail.length; i++) {
     ctx.fillRect(tail[i].x*px_len,tail[i].y*px_len,px_len,px_len);
+    if(snake_x == tail[i].x && snake_y == tail[i].y) {
+        tail_length = 4;
+    }
   }
   tail.push({x:snake_x,y:snake_y});
   if(tail.length > tail_length) {
-      tail.shift();  
+      tail.shift();
   }
+
+  if(snake_x == apple_x && snake_y == apple_y) {
+      tail_length++;
+      apple_x = Math.floor(Math.Random()*20);
+      apple_y = Math.floor(Math.Random()*20);
+  }
+  ctx.fillStyle = "red";
+  ctx.fillRect(apple_x,apple_y,px_len,px_len);
 }
 
 function pushed_key(event) {
