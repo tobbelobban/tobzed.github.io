@@ -47,7 +47,7 @@ function game() {
   if(snake_x == apple_x && snake_y == apple_y) {
       tail_length++;
       score++;
-      document.getElementById("p1").innerHTML = "SCORE: " + score;
+      document.getElementById("score").innerHTML = "SCORE: " + score;
       apple_x = Math.floor(Math.random()*20);
       apple_y = Math.floor(Math.random()*20);
   }
