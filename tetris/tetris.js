@@ -88,7 +88,7 @@ function piece(x, y, type) {
             this.y3 = this.y + 1;
             this.x4 = this.x2;
             this.y4 = this.y3;
-            this.color = "#ffff00";
+            this.color = "#00ffff";
             break;
                 
             case "rightSnake":
@@ -98,7 +98,7 @@ function piece(x, y, type) {
             this.y3 = this.y + 1;
             this.x4 = this.x - 1;
             this.y4 = this.y3;
-            this.color = "#ff0000";
+            this.color = "#00ffff";
             break;
                 
             case "leftSnake":
@@ -108,7 +108,7 @@ function piece(x, y, type) {
             this.y3 = this.y + 1;
             this.x4 = this.x + 1;
             this.y4 = this.y3;
-            this.color = "#00ff00";
+            this.color = "#00ffff";
             break;
                 
             case "pyramid":
@@ -118,7 +118,7 @@ function piece(x, y, type) {
             this.y3 = this.y;
             this.x4 = this.x + 1;
             this.y4 = this.y;
-            this.color = "#cc00cc";
+            this.color = "#00ffff";
             break;
                 
             case "rightL":
@@ -128,7 +128,7 @@ function piece(x, y, type) {
             this.y3 = this.y;
             this.x4 = this.x3;
             this.y4 = this.y + 1;
-            this.color = "#ff9900";
+            this.color = "#00ffff";
             break;
                 
             case "leftL":
@@ -138,7 +138,7 @@ function piece(x, y, type) {
             this.y3 = this.y;
             this.x4 = this.x2;
             this.y4 = this.y + 1;
-            this.color = "#0000cc";
+            this.color = "#00ffff";
             break;
         }
         this.saveOld();
