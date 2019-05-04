@@ -37,6 +37,8 @@ function game() {
     ctx.fillRect(tail[i].x*px_len,tail[i].y*px_len-1,px_len,px_len-1);
     if(snake_x == tail[i].x && snake_y == tail[i].y) {
         tail_length = 4;
+        score = 0;
+        document.getElementById("score").innerHTML = "SCORE: 0";
     }
   }
   tail.push({x:snake_x,y:snake_y});
