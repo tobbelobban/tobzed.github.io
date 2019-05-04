@@ -74,80 +74,71 @@ function piece(x, y, type) {
             case "line":
             this.x2 = this.x - 1;
             this.y2 = this.y;
-
             this.x3 = this.x + 1;
             this.y3 = this.y;
-
             this.x4 = this.x + 2;
             this.y4 = this.y;
-
-            this.color = "red";
+            this.color = "#00ffff";
             break;
+                
             case "square":
             this.x2 = this.x + 1;
             this.y2 = this.y;
-
             this.x3 = this.x;
             this.y3 = this.y + 1;
-
             this.x4 = this.x2;
             this.y4 = this.y3;
-            this.color = "green";
+            this.color = "#ffff00";
             break;
+                
             case "rightSnake":
             this.x2 = this.x + 1;
             this.y2 = this.y;
-
             this.x3 = this.x;
             this.y3 = this.y + 1;
-
             this.x4 = this.x - 1;
             this.y4 = this.y3;
-            this.color = "yellow";
+            this.color = "##ff0000";
             break;
+                
             case "leftSnake":
             this.x2 = this.x - 1;
             this.y2 = this.y;
-
             this.x3 = this.x;
             this.y3 = this.y + 1;
-
             this.x4 = this.x + 1;
             this.y4 = this.y3;
-            this.color = "orange";
+            this.color = "#00ff00";
             break;
+                
             case "pyramid":
             this.x2 = this.x;
             this.y2 = this.y + 1;
-
             this.x3 = this.x - 1;
             this.y3 = this.y;
-
             this.x4 = this.x + 1;
             this.y4 = this.y;
-            this.color = "purple";
+            this.color = "#cc00cc";
             break;
+                
             case "rightL":
             this.x2 = this.x + 1;
             this.y2 = this.y;
-
             this.x3 = this.x - 1;
             this.y3 = this.y;
-
             this.x4 = this.x3;
             this.y4 = this.y + 1;
-            this.color = "black";
+            this.color = "ff9900";
             break;
+                
             case "leftL":
             this.x2 = this.x + 1;
             this.y2 = this.y;
-
             this.x3 = this.x - 1;
             this.y3 = this.y;
-
             this.x4 = this.x2;
             this.y4 = this.y + 1;
-            this.color = "white";
+            this.color = "0000cc";
             break;
         }
         this.saveOld();
