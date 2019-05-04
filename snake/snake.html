@@ -1,4 +1,5 @@
 <canvas id="canvas" width="400" height="400"></canvas>
+<h1 id="score"> SCORE: 0</h1>
 <script>
 window.onload = function() {
   canvas = document.getElementById("canvas");
@@ -14,6 +15,7 @@ px_len = 20;
 tail_length = 4;
 tail = [];
 tile_count = canvas.width / px_len;
+score = 0;
 pressed = false;
 
 function game() {
@@ -44,6 +46,8 @@ function game() {
 
   if(snake_x == apple_x && snake_y == apple_y) {
       tail_length++;
+      score++;
+      document.getElementById("p1").innerHTML = "SCORE: " + score;
       apple_x = Math.floor(Math.random()*20);
       apple_y = Math.floor(Math.random()*20);
   }
