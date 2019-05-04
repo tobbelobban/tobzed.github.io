@@ -14,6 +14,7 @@ px_len = 20;
 tail_length = 4;
 tail = [];
 tile_count = canvas.width / px_len;
+pressed = false;
 
 function game() {
   snake_x += x_vel;
@@ -48,9 +49,11 @@ function game() {
   }
   ctx.fillStyle = "red";
   ctx.fillRect(apple_x*px_len,apple_y*px_len-1,px_len,px_len-1);
+  pressed = false;
 }
 
 function pushed_key(event) {
+  if(pressed) return;
   switch(event.keyCode) {
     case 37:
       if(x_vel != 1) {
@@ -77,5 +80,6 @@ function pushed_key(event) {
       }
       break;
   }
+  pressed = true;
 }
 </script>
