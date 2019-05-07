@@ -1,4 +1,3 @@
-
 var player;
 var canvas;
 var ctx;
@@ -15,8 +14,8 @@ var tiles = {
         }
         for(var i = 0; i < 10; i++) {
             for(var j = 0; j < 21; j++) {
-                j == 20 ? tiles.board[i][j] = new tile("#A9A9A9", true) :
-                tiles.board[i][j] = new tile("#A9A9A9", false);
+                j == 20 ? tiles.board[i][j] = new tile("white", true) :
+                tiles.board[i][j] = new tile("white", false);
             }
         }
     }
@@ -61,7 +60,6 @@ function selectPiece() {
         case 7:
         return "leftL";
         default:
-        console.log(id);
     }
 }
 
@@ -78,9 +76,9 @@ function piece(x, y, type) {
             this.y3 = this.y;
             this.x4 = this.x + 2;
             this.y4 = this.y;
-            this.color = "#00ffff";
+            this.color = "#0000FF"; // blue
             break;
-                
+
             case "square":
             this.x2 = this.x + 1;
             this.y2 = this.y;
@@ -88,9 +86,9 @@ function piece(x, y, type) {
             this.y3 = this.y + 1;
             this.x4 = this.x2;
             this.y4 = this.y3;
-            this.color = "#00ffff";
+            this.color = "#FFFF00"; // yellow
             break;
-                
+
             case "rightSnake":
             this.x2 = this.x + 1;
             this.y2 = this.y;
@@ -98,9 +96,9 @@ function piece(x, y, type) {
             this.y3 = this.y + 1;
             this.x4 = this.x - 1;
             this.y4 = this.y3;
-            this.color = "#00ffff";
+            this.color = "#FF0000"; // red
             break;
-                
+
             case "leftSnake":
             this.x2 = this.x - 1;
             this.y2 = this.y;
@@ -108,9 +106,9 @@ function piece(x, y, type) {
             this.y3 = this.y + 1;
             this.x4 = this.x + 1;
             this.y4 = this.y3;
-            this.color = "#00ffff";
+            this.color = "#00FF00"; // green
             break;
-                
+
             case "pyramid":
             this.x2 = this.x;
             this.y2 = this.y + 1;
@@ -118,9 +116,9 @@ function piece(x, y, type) {
             this.y3 = this.y;
             this.x4 = this.x + 1;
             this.y4 = this.y;
-            this.color = "#00ffff";
+            this.color = "#FF00FF"; // magenta
             break;
-                
+
             case "rightL":
             this.x2 = this.x + 1;
             this.y2 = this.y;
@@ -128,9 +126,9 @@ function piece(x, y, type) {
             this.y3 = this.y;
             this.x4 = this.x3;
             this.y4 = this.y + 1;
-            this.color = "#00ffff";
+            this.color = "#00FFFF"; // cyan
             break;
-                
+
             case "leftL":
             this.x2 = this.x + 1;
             this.y2 = this.y;
@@ -138,7 +136,7 @@ function piece(x, y, type) {
             this.y3 = this.y;
             this.x4 = this.x2;
             this.y4 = this.y + 1;
-            this.color = "#00ffff";
+            this.color = "orange";
             break;
         }
         this.saveOld();
@@ -148,20 +146,25 @@ function piece(x, y, type) {
         var tempy = this.y2;
         var newx = this.x + this.y - tempy;
         var newy = this.y - this.x + tempx;
+
         if(this.type === "square" || newx < 0 || newx > 9 || newy < 0 || newy > 19) {
             return false;
         }
+
         tempx = this.x3;
         tempy = this.y3;
         newx = this.x + this.y - tempy;
         newy = this.y - this.x + tempx;
+
         if(newx < 0 || newx > 9 || newy < 0 || newy > 19) {
             return false;
         }
+
         tempx = this.x4;
         tempy = this.y4;
         newx = this.x + this.y - tempy;
         newy = this.y - this.x + tempx;
+
         if(newx < 0 || newx > 9 || newy < 0 || newy > 19) {
             return false;
         }
@@ -266,6 +269,9 @@ function piece(x, y, type) {
                     for(var j = 0; j < 21; j++) {
                         ctx.fillStyle = tiles.board[i][j].color;
                         ctx.fillRect(i*30, j*30, 30, 30);
+                        // ctx.fillStyle = "grey";
+                        // ctx.rect(i*30, j*30, 30, 30);
+                        // ctx.stroke();
                     }
                 }
                 player.drawPiece();
@@ -283,14 +289,14 @@ function piece(x, y, type) {
                     if(lineDone) {
                         for(var x = 0; x < 10; x++) {
                             tiles.board[x][y].value = false;
-                            tiles.board[x][y].color = "#A9A9A9";
+                            tiles.board[x][y].color = "white";
                         }
                         lineCount+=1;
                     } else if (lineCount > 0) {
                         for(var x = 0; x < 10; x++) {
                             if(tiles.board[x][y].value) {
                                 var tempColor = tiles.board[x][y].color;
-                                tiles.board[x][y].color = "#A9A9A9";
+                                tiles.board[x][y].color = "white";
                                 tiles.board[x][y].value = false;
 
                                 tiles.board[x][y+lineCount].value = true;
@@ -300,7 +306,6 @@ function piece(x, y, type) {
                     }
                 }
                 score += lineCount;
-                console.log(score);
             }
 
             function findMinRow() {
