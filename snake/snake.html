@@ -64,6 +64,7 @@ function game() {
     clearInterval(game_interval);
     speed += speed*0.5;
     game_interval = setInterval(game, speed);
+    next_lvl *= 2;
   }
 }
 
