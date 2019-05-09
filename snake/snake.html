@@ -1,22 +1,25 @@
 <canvas id="canvas" width="400" height="400"></canvas>
 <h1 id="score"> SCORE: 0</h1>
 <script>
-window.onload = function() {
-  canvas = document.getElementById("canvas");
-  ctx = canvas.getContext("2d");
-  document.addEventListener("keydown", pushed_key);
-  setInterval(game,1000/15);
-};
 
 snake_x = 9, snake_y = 9;
 apple_x = 12, apple_y = 12;
+next_lvl = 10;
 x_vel = 0, y_vel = 0;
 px_len = 20;
 tail_length = 4;
+speed = 1000 / 15;
 tail = [];
 tile_count = canvas.width / px_len;
 score = 0;
 pressed = false;
+  
+window.onload = function() {
+  canvas = document.getElementById("canvas");
+  ctx = canvas.getContext("2d");
+  document.addEventListener("keydown", pushed_key);
+  game_interval = setInterval(game,speed);
+};
 
 function game() {
   snake_x += x_vel;
@@ -57,6 +60,12 @@ function game() {
   ctx.fillStyle = "red";
   ctx.fillRect(apple_x*px_len,apple_y*px_len-1,px_len,px_len-1);
   pressed = false;
+  
+  if(score >= next_lvl) {
+    clearInterval(game_interval);
+    speed += speed*0.5;
+    game_interval = setInterval(game, speed);
+  }
 }
 
 function pushed_key(event) {
