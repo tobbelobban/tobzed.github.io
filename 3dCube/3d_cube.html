@@ -1,0 +1,137 @@
+<canvas id="canvas" width="400" height="400"></canvas>
+<h5 id="zoom"> Zoom: up/down arrow</h5>
+<h5 id="x_rotate"> Rotate x-axis: w/s</h5>
+<h5 id="y_rotate"> Rotate y-axis: a/d</h5>
+<h5 id="z_rotate"> Rotate z-axis: left/right arrow</h5>
+<button id="faces" type="button" onclick="change()">Hide faces</button>
+
+<script>
+
+window.onload = function() {
+  vertices = [
+              [1,1,1], [1,-1,1], [-1,1,1], [-1,-1,1],
+              [1,1,-1], [1,-1,-1], [-1,1,-1], [-1,-1,-1]
+             ];
+
+  edges = [ [0,1], [0,2], [0,4], [1,3], [1,5], [2,3], [2,6], [3,7], [4,5], [4,6], [5,7], [6,7] ];
+  faces = [
+            [0,1,3,2],
+            [0,1,5,4],
+            [0,2,6,4],
+            [1,3,7,5],
+            [4,5,7,6],
+            [2,3,7,6]
+          ];
+  canvas = document.getElementById("canvas");
+  ctx = canvas.getContext("2d");
+  cam_pos = -2;
+  show_faces = true;
+  document.addEventListener("keydown", pushed_key);
+  setInterval(loop,1000/15);
+};
+
+function change() {
+  show_faces = !show_faces;
+  if(show_faces) {
+    document.getElementById("faces").innerText = "Hide faces";
+  } else {
+    document.getElementById("faces").innerText = "Show faces";
+  }
+}
+
+function rotate_x(theta) {
+  let tmp_points = [];
+  vertices.forEach(v => {
+    tmp_points.push([v[0], Math.cos(theta)*v[1] - Math.sin(theta)*v[2], Math.sin(theta)*v[1] + Math.cos(theta)*v[2]]) 
+  });
+  vertices = tmp_points;
+}
+
+function rotate_y(theta) {
+  let tmp_points = [];
+  vertices.forEach(v => {
+    tmp_points.push([Math.cos(theta)*v[0] + Math.sin(theta)*v[2], v[1], -Math.sin(theta)*v[0] + Math.cos(theta)*v[2]]) 
+  });
+  vertices = tmp_points;
+}
+
+function rotate_z(theta) {
+  let tmp_points = [];
+  vertices.forEach(v => {
+    tmp_points.push([Math.cos(theta)*v[0] - Math.sin(theta)*v[1], Math.sin(theta)*v[0] + Math.cos(theta)*v[1], v[2]]) 
+  });
+  vertices = tmp_points;
+}
+
+function draw() {
+  let tmp_points = [];
+  vertices.forEach(v => {
+    let x = v[0]/(v[2]-cam_pos) * 50 + 200;
+    let y = v[1]/(v[2]-cam_pos) * 50 + 200;
+    tmp_points.push([x,y]);
+  });
+  ctx.fillStyle = 'black';
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle = 'red';
+  ctx.strokeStyle = 'blue';
+/*  edges.forEach( e => {
+    ctx.beginPath();
+    ctx.moveTo(tmp_points[e[0]][0], tmp_points[e[0]][1]);
+    ctx.lineTo(tmp_points[e[1]][0], tmp_points[e[1]][1]);
+    ctx.stroke();
+  });*/
+
+  faces.forEach( f => {
+    ctx.beginPath();
+    ctx.moveTo(tmp_points[f[0]][0], tmp_points[f[0]][1]);
+    ctx.lineTo(tmp_points[f[1]][0], tmp_points[f[1]][1]);
+    ctx.lineTo(tmp_points[f[2]][0], tmp_points[f[2]][1]);
+    ctx.lineTo(tmp_points[f[3]][0], tmp_points[f[3]][1]);
+    ctx.lineTo(tmp_points[f[0]][0], tmp_points[f[0]][1]);
+    ctx.stroke();
+    if(show_faces) ctx.fill();
+  });
+}
+
+function pushed_key(event) {
+
+  switch(event.keyCode) {
+    case 38:
+        cam_pos += 0.1;
+        break;
+    case 40:
+        cam_pos -= 0.1;
+        break;
+
+
+    case 37:
+        rotate_z(0.05);
+        break;
+    case 39:
+        rotate_z(-0.05);
+        break;
+
+
+    case 65:
+        rotate_y(0.05);
+        break;
+    case 68:
+        rotate_y(-0.05);
+        break;
+
+
+    case 87:
+        rotate_x(0.05);
+        break;
+    case 83:
+        rotate_x(-0.05);
+        break;
+  }
+
+}
+
+function loop() {
+  draw();
+}
+
+</script>
