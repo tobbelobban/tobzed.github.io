@@ -304,12 +304,10 @@ function clearLines(fromLine) {
         } else if (lineCount > 0) {
             for(var x = 0; x < 10; x++) {
                 if(tiles.board[x][y].value) {
-                    var tempColor = tiles.board[x][y].color;
+                    tiles.board[x][y+lineCount].color = tiles.board[x][y].color;
                     tiles.board[x][y].color = "white";
                     tiles.board[x][y].value = false;
-
                     tiles.board[x][y+lineCount].value = true;
-                    tiles.board[x][y+lineCount].color = tempColor;
                 }
             }
         }
