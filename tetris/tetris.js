@@ -27,7 +27,7 @@ function startGame() {
     tiles.setupTiles();
     player = new piece(4, 0, selectPiece());
     player.setupPiece();
-    player.drawPiece();
+    paintAll();
     window.addEventListener('keydown', keypress);
     window.addEventListener('keyup', keyup);
     gameInterval = setInterval(tick, 600);
@@ -278,9 +278,6 @@ function paintAll() {
         for(var j = 0; j < 21; j++) {
             ctx.fillStyle = tiles.board[i][j].color;
             ctx.fillRect(i*30, j*30, 30, 30);
-            // ctx.fillStyle = "grey";
-            // ctx.rect(i*30, j*30, 30, 30);
-            // ctx.stroke();
         }
     }
     player.drawPiece();
@@ -334,7 +331,6 @@ function newPiece() {
     clearLines(findMinRow());
     player = new piece(4, 0, selectPiece());
     player.setupPiece();
-    clearCanvas();
     paintAll();
 }
 
