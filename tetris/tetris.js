@@ -194,6 +194,13 @@ function piece(x, y, type) {
         ctx.fillRect(this.x2*30, this.y2*30, 30, 30);
         ctx.fillRect(this.x3*30, this.y3*30, 30, 30);
         ctx.fillRect(this.x4*30, this.y4*30, 30, 30);
+
+        ctx.strokeStyle = "black";
+        ctx.strokeRect(this.x*30, this.y*30, 30, 30);
+        ctx.strokeRect(this.x2*30, this.y2*30, 30, 30);
+        ctx.strokeRect(this.x3*30, this.y3*30, 30, 30);
+        ctx.strokeRect(this.x4*30, this.y4*30, 30, 30);
+
     }
 
     this.canDrop = function() {
@@ -277,8 +284,9 @@ function paintAll() {
     for(var i = 0; i < 10; i++) {
         for(var j = 0; j < 21; j++) {
             ctx.fillStyle = tiles.board[i][j].color;
-            console.log(ctx.fillStyle);
             ctx.fillRect(i*30, j*30, 30, 30);
+            ctx.strokeStyle = "black";
+            ctx.strokeRect(i*30, j*30, 30, 30);
         }
     }
     player.drawPiece();
