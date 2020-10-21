@@ -141,6 +141,7 @@ function piece(x, y, type) {
         }
         this.saveOld();
     }
+
     this.canRotate = function() {
         var tempx = this.x2;
         var tempy = this.y2;
@@ -170,6 +171,7 @@ function piece(x, y, type) {
         }
         return true;
     }
+
     this.rotate = function() {
         if(!this.canRotate()) {
             return false;
@@ -185,6 +187,7 @@ function piece(x, y, type) {
         this.y4 = this.y - this.x + this.oldx4;
         return true;
     }
+
     this.drawPiece = function() {
         ctx.fillStyle = this.color;
         ctx.fillRect(this.x*30, this.y*30, 30, 30);
@@ -192,201 +195,208 @@ function piece(x, y, type) {
         ctx.fillRect(this.x3*30, this.y3*30, 30, 30);
         ctx.fillRect(this.x4*30, this.y4*30, 30, 30);
     }
+
     this.canDrop = function() {
         if(tiles.board[this.x][this.y + 1].value ||
             tiles.board[this.x2][this.y2 + 1].value ||
             tiles.board[this.x3][this.y3 + 1].value ||
             tiles.board[this.x4][this.y4 + 1]. value) {
                 return false;
-            }
-            return true;
         }
-        this.drop = function() {
-            if(!this.canDrop()) {
+        return true;
+    }
+
+    this.drop = function() {
+        if(!this.canDrop()) {
+            return false;
+        }
+        this.saveOld();
+        this.y++;
+        this.y2++;
+        this.y3++;
+        this.y4++;
+        return true;
+    }
+
+    this.moveLeft = function() {
+        if(this.x == 0 || this.x2 == 0 || this.x3 == 0 || this.x4 == 0 ||
+            tiles.board[this.x-1][this.y].value ||
+            tiles.board[this.x2-1][this.y2].value ||
+            tiles.board[this.x3-1][this.y3].value ||
+            tiles.board[this.x4-1][this.y4].value) {
                 return false;
-            }
-            this.saveOld();
-            this.y++;
-            this.y2++;
-            this.y3++;
-            this.y4++;
-            return true;
         }
-        this.moveLeft = function() {
-            if(this.x == 0 || this.x2 == 0 || this.x3 == 0 || this.x4 == 0 ||
-                tiles.board[this.x-1][this.y].value ||
-                tiles.board[this.x2-1][this.y2].value ||
-                tiles.board[this.x3-1][this.y3].value ||
-                tiles.board[this.x4-1][this.y4].value) {
-                    return false;
-                }
-                this.saveOld();
-                this.x--;
-                this.x2--;
-                this.x3--;
-                this.x4--;
-                return true;
-            }
-            this.moveRight = function() {
-                if(this.x == 9 || this.x2 == 9 || this.x3 == 9 || this.x4 == 9 ||
-                    tiles.board[this.x+1][this.y].value ||
-                    tiles.board[this.x2+1][this.y2].value ||
-                    tiles.board[this.x3+1][this.y3].value ||
-                    tiles.board[this.x4+1][this.y4].value) {
-                        return false;
-                    }
-                    this.saveOld();
-                    this.x++;
-                    this.x2++;
-                    this.x3++;
-                    this.x4++;
-                    return true;
-                }
-                this.placePiece = function() {
-                    tiles.board[this.x][this.y].value = true;
-                    tiles.board[this.x2][this.y2].value = true;
-                    tiles.board[this.x3][this.y3].value = true;
-                    tiles.board[this.x4][this.y4]. value = true;
-                    tiles.board[this.x][this.y].color = this.color;
-                    tiles.board[this.x2][this.y2].color = this.color;
-                    tiles.board[this.x3][this.y3].color = this.color;
-                    tiles.board[this.x4][this.y4].color = this.color;
-                }
-                this.saveOld = function() {
-                    this.oldx = this.x;
-                    this.oldy = this.y;
-                    this.oldx2 = this.x2;
-                    this.oldy2 = this.y2;
-                    this.oldx3 = this.x3;
-                    this.oldy3 = this.y3;
-                    this.oldx4 = this.x4;
-                    this.oldy4 = this.y4;
-                }
-            }
+        this.saveOld();
+        this.x--;
+        this.x2--;
+        this.x3--;
+        this.x4--;
+        return true;
+    }
 
-            function paintAll() {
-                for(var i = 0; i < 10; i++) {
-                    for(var j = 0; j < 21; j++) {
-                        ctx.fillStyle = tiles.board[i][j].color;
-                        ctx.fillRect(i*30, j*30, 30, 30);
-                        // ctx.fillStyle = "grey";
-                        // ctx.rect(i*30, j*30, 30, 30);
-                        // ctx.stroke();
-                    }
-                }
-                player.drawPiece();
+    this.moveRight = function() {
+        if(this.x == 9 || this.x2 == 9 || this.x3 == 9 || this.x4 == 9 ||
+            tiles.board[this.x+1][this.y].value ||
+            tiles.board[this.x2+1][this.y2].value ||
+            tiles.board[this.x3+1][this.y3].value ||
+            tiles.board[this.x4+1][this.y4].value) {
+                return false;
+        }
+        this.saveOld();
+        this.x++;
+        this.x2++;
+        this.x3++;
+        this.x4++;
+        return true;
+    }
+
+    this.placePiece = function() {
+        tiles.board[this.x][this.y].value = true;
+        tiles.board[this.x2][this.y2].value = true;
+        tiles.board[this.x3][this.y3].value = true;
+        tiles.board[this.x4][this.y4]. value = true;
+        tiles.board[this.x][this.y].color = this.color;
+        tiles.board[this.x2][this.y2].color = this.color;
+        tiles.board[this.x3][this.y3].color = this.color;
+        tiles.board[this.x4][this.y4].color = this.color;
+    }
+
+    this.saveOld = function() {
+        this.oldx = this.x;
+        this.oldy = this.y;
+        this.oldx2 = this.x2;
+        this.oldy2 = this.y2;
+        this.oldx3 = this.x3;
+        this.oldy3 = this.y3;
+        this.oldx4 = this.x4;
+        this.oldy4 = this.y4;
+    }
+}
+
+function paintAll() {
+    for(var i = 0; i < 10; i++) {
+        for(var j = 0; j < 21; j++) {
+            ctx.fillStyle = tiles.board[i][j].color;
+            ctx.fillRect(i*30, j*30, 30, 30);
+            // ctx.fillStyle = "grey";
+            // ctx.rect(i*30, j*30, 30, 30);
+            // ctx.stroke();
+        }
+    }
+    player.drawPiece();
+}
+
+function clearLines(fromLine) {
+    var lineCount = 0;
+    for(var y = fromLine; y > -1; y--) {
+        var lineDone = true;
+        for(var x = 0; x < 10; x++) {
+            if(!tiles.board[x][y].value) {
+                lineDone = false;
             }
-
-            function clearLines(fromLine) {
-                var lineCount = 0;
-                for(var y = fromLine; y > -1; y--) {
-                    var lineDone = true;
-                    for(var x = 0; x < 10; x++) {
-                        if(!tiles.board[x][y].value) {
-                            lineDone = false;
-                        }
-                    }
-                    if(lineDone) {
-                        for(var x = 0; x < 10; x++) {
-                            tiles.board[x][y].value = false;
-                            tiles.board[x][y].color = "white";
-                        }
-                        lineCount+=1;
-                    } else if (lineCount > 0) {
-                        for(var x = 0; x < 10; x++) {
-                            if(tiles.board[x][y].value) {
-                                var tempColor = tiles.board[x][y].color;
-                                tiles.board[x][y].color = "white";
-                                tiles.board[x][y].value = false;
-
-                                tiles.board[x][y+lineCount].value = true;
-                                tiles.board[x][y+lineCount].color = tempColor;
-                            }
-                        }
-                    }
-                }
-                score += lineCount;
+        }
+        if(lineDone) {
+            for(var x = 0; x < 10; x++) {
+                tiles.board[x][y].value = false;
+                tiles.board[x][y].color = "white";
             }
+            lineCount+=1;
+        } else if (lineCount > 0) {
+            for(var x = 0; x < 10; x++) {
+                if(tiles.board[x][y].value) {
+                    var tempColor = tiles.board[x][y].color;
+                    tiles.board[x][y].color = "white";
+                    tiles.board[x][y].value = false;
 
-            function findMinRow() {
-                var lowest = player.y;
-                if(lowest < player.y2) {
-                    lowest = player.y2;
-                }
-                if(lowest < player.y3) {
-                    lowest = player.y3;
-                }
-                if(lowest < player.y4) {
-                    return player.y4;
-                }
-                return lowest;
-            }
-
-            function newPiece() {
-                player.placePiece();
-                clearLines(findMinRow());
-                player = new piece(4, 0, selectPiece());
-                player.setupPiece();
-                clearCanvas();
-                paintAll();
-            }
-
-            function movePlayer() {
-                ctx.clearRect(player.oldx*30, player.oldy*30, 30, 30);
-                ctx.clearRect(player.oldx2*30, player.oldy2*30, 30, 30);
-                ctx.clearRect(player.oldx3*30, player.oldy3*30, 30, 30);
-                ctx.clearRect(player.oldx4*30, player.oldy4*30, 30, 30);
-                player.drawPiece();
-            }
-
-            function replace() {
-                var falling = true;
-                while(falling) {
-                    falling = player.drop();
+                    tiles.board[x][y+lineCount].value = true;
+                    tiles.board[x][y+lineCount].color = tempColor;
                 }
             }
+        }
+    }
+    score += lineCount;
+}
 
-            function keyup(e) {
-                released = true;
-            }
+function findMinRow() {
+    var lowest = player.y;
+    if(lowest < player.y2) {
+        lowest = player.y2;
+    }
+    if(lowest < player.y3) {
+        lowest = player.y3;
+    }
+    if(lowest < player.y4) {
+        return player.y4;
+    }
+    return lowest;
+}
 
-            function keypress(e) {
-                //console.log(e.which);
-                var moved = false;
-                switch (e.keyCode) {
-                    case 32:
-                    replace();
-                    break;
-                    case 38:
-                    if(!released) {
-                        return;
-                    }
-                    released = false;
-                    moved = player.rotate();
-                    break;
-                    case 37:
-                    moved = player.moveLeft();
-                    break;
-                    case 39:
-                    moved = player.moveRight();
-                    break;
-                    case 40:
-                    moved = player.drop();
-                    break;
-                }
-                if(moved) {
-                    movePlayer();
-                } else if (e.keyCode == 40 || e.keyCode == 32) {
-                    newPiece();
-                }
-            }
+function newPiece() {
+    player.placePiece();
+    clearLines(findMinRow());
+    player = new piece(4, 0, selectPiece());
+    player.setupPiece();
+    clearCanvas();
+    paintAll();
+}
 
-            function tick() {
-                if(!player.drop()) {
-                    newPiece();
-                } else {
-                    movePlayer();
-                }
-            }
+function movePlayer() {
+    ctx.fillStyle = "white";
+    ctx.fillRect(player.oldx*30, player.oldy*30, 30, 30);
+    ctx.fillRect(player.oldx2*30, player.oldy2*30, 30, 30);
+    ctx.fillRect(player.oldx3*30, player.oldy3*30, 30, 30);
+    ctx.fillRect(player.oldx4*30, player.oldy4*30, 30, 30);
+    player.drawPiece();
+}
 
-            startGame();
+function replace() {
+    var falling = true;
+    while(falling) {
+        falling = player.drop();
+    }
+}
+
+function keyup(e) {
+    released = true;
+}
+
+function keypress(e) {
+    //console.log(e.which);
+    var moved = false;
+    switch (e.keyCode) {
+        case 32:
+        replace();
+        break;
+        case 38:
+        if(!released) {
+            return;
+        }
+        released = false;
+        moved = player.rotate();
+        break;
+        case 37:
+        moved = player.moveLeft();
+        break;
+        case 39:
+        moved = player.moveRight();
+        break;
+        case 40:
+        moved = player.drop();
+        break;
+    }
+    if(moved) {
+        movePlayer();
+    } else if (e.keyCode == 40 || e.keyCode == 32) {
+        newPiece();
+    }
+}
+
+function tick() {
+    if(player.drop()) {
+        movePlayer();
+    } else {
+        newPiece();
+    }
+}
+
+startGame();
