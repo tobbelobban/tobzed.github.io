@@ -277,6 +277,7 @@ function paintAll() {
     for(var i = 0; i < 10; i++) {
         for(var j = 0; j < 21; j++) {
             ctx.fillStyle = tiles.board[i][j].color;
+            console.log(ctx.fillStyle);
             ctx.fillRect(i*30, j*30, 30, 30);
         }
     }
