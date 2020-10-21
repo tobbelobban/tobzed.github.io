@@ -285,7 +285,7 @@ function paintAll() {
         for(var j = 0; j < 21; j++) {
             ctx.fillStyle = tiles.board[i][j].color;
             ctx.fillRect(i*30, j*30, 30, 30);
-            ctx.strokeStyle = "black";
+            ctx.strokeStyle = "grey";
             ctx.strokeRect(i*30, j*30, 30, 30);
         }
     }
@@ -349,6 +349,12 @@ function movePlayer() {
     ctx.fillRect(player.oldx2*30, player.oldy2*30, 30, 30);
     ctx.fillRect(player.oldx3*30, player.oldy3*30, 30, 30);
     ctx.fillRect(player.oldx4*30, player.oldy4*30, 30, 30);
+
+    ctx.strokeStyle = "grey";
+    ctx.strokeRect(player.oldx*30, player.oldy*30, 30, 30);
+    ctx.strokeRect(player.oldx2*30, player.oldy2*30, 30, 30);
+    ctx.strokeRect(player.oldx3*30, player.oldy3*30, 30, 30);
+    ctx.strokeRect(player.oldx4*30, player.oldy4*30, 30, 30);
     player.drawPiece();
 }
 
