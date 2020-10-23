@@ -28,6 +28,7 @@ function startGame() {
     player = new piece(4, 0, selectPiece());
     player.setupPiece();
     paintAll();
+    document.getElementById("score").innerText = "Score: 0";
     window.addEventListener('keydown', keypress);
     window.addEventListener('keyup', keyup);
     gameInterval = setInterval(tick, 600);
@@ -405,7 +406,7 @@ function tick() {
         movePlayer();
     } else {
         newPiece();
-        document.getElementById("score").value = "Score: " + score;
+        document.getElementById("score").text = "Score: " + score;
     }
 }
 
