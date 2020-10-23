@@ -320,6 +320,7 @@ function clearLines(fromLine) {
         }
     }
     score += lineCount;
+    document.getElementById("score").innerText = "Score: " + score;
 }
 
 function findMinRow() {
@@ -402,11 +403,11 @@ function keypress(e) {
 }
 
 function tick() {
-    document.getElementById("score").innerText = "Score: " + score;
     if(player.drop()) {
         movePlayer();
     } else {
         newPiece();
+
     }
 }
 
