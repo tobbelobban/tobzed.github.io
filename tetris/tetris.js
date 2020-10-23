@@ -402,10 +402,10 @@ function keypress(e) {
 }
 
 function tick() {
+    document.getElementById("score").innerText = "Score: " + score;
     if(player.drop()) {
         movePlayer();
     } else {
-        document.getElementById("score").innerText = "Score: " + score;
         newPiece();
     }
 }
