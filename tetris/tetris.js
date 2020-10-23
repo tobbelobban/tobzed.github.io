@@ -402,11 +402,16 @@ function keypress(e) {
 }
 
 function tick() {
+    var oldscore = 0;
     if(player.drop()) {
         movePlayer();
     } else {
         newPiece();
-        document.getElementById("score").innerText = "Score: " + score;
+        if(oldscore < score) {
+            document.getElementById("score").innerText = "Score: " + score;
+            console.log("bob");
+        }
+
     }
 }
 
