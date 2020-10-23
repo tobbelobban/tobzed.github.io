@@ -410,6 +410,7 @@ function tick() {
         if(oldscore < score) {
             document.getElementById("score").innerText = "Score: " + score;
             console.log("bob");
+            oldscore = score;
         }
 
     }
