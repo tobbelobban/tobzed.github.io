@@ -405,6 +405,7 @@ function tick() {
         movePlayer();
     } else {
         newPiece();
+        document.getElementById("score").value = "Score: " + score;
     }
 }
 
