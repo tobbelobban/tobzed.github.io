@@ -408,9 +408,9 @@ function keypress(e) {
 }
 
 function displayGameOver() {
-    var go_header = document.createElement("h1");                 // Create a <li> node
+    var go_header = document.createElement("h1");
     go_header.innerText = "GAME OVER!";
-    document.body.appendChild(go_header);
+    document.getElementById("div").appendChild(go_header);
 }
 
 function tick() {
