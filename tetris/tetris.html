@@ -21,10 +21,19 @@
             margin-left: auto;
             margin-right: auto;
         }
+        
+        div{
+              display: flex;
+              flex-direction: column;
+              justify-content: center;
+              text-align: center;
+        }
   </style>
     <body>
-        <canvas id="canvas" width="300" height="600"></canvas>
-        <h1 id="score"></h1>
-        <script src="tetris.js"></script>
+        <div>
+            <canvas id="canvas" width="300" height="600"></canvas>
+            <h1 id="score"></h1>
+            <script src="tetris.js"></script>
+        </div>
     </body>
 </html>
