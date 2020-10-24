@@ -4,19 +4,25 @@
     justify-content: center;
 }
 
-a {
-    text-decoration: none;
-}
-
 .thumbnail_wrapper {
-    border: 1px solid lightgrey;
+    border: 1px solid grey;
     padding: 1rem;
     margin: 1rem;
 }
 
+.thumbnail_wrapper > a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.thumbnail_wrapper > a:visited {
+    color: inherit;
+}
 .thumbnail_wrapper:hover {
     background-color: black;
+    color: white;
 }
+
 .thumbnail_image {
     width: 100%;
     max-width: 20rem;
