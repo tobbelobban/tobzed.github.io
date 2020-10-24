@@ -22,25 +22,32 @@
             margin-right: auto;
         }
 
+        h2 {
+            border: 1px solid "black";
+            padding-left: 0;
+            padding-right: 0;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        h2:hover {
+            background-color: "black";
+            color: "white";
+        }
+
         div{
               display: flex;
               flex-direction: column;
               justify-content: center;
               text-align: center;
         }
-        
-        button {
-            height:50px;
-            width:100px";
-            margin-left: auto;
-            margin-right: auto;
-        }
+
   </style>
     <body>
         <div id="div">
             <canvas id="canvas" width="300" height="600"></canvas>
             <h1 id="score"></h1>
-            <button type="button" id="reset_btn">Reset game</button>
+            <h2 id="reset_btn">Reset game</h2>
         </div>
         <script src="tetris.js"></script>
     </body>
