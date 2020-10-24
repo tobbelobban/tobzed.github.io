@@ -141,6 +141,7 @@ function piece(x, y, type) {
             break;
         }
         this.saveOld();
+        return !(tiles.board[this.x][this.y].value || tiles.board[this.x4][this.y4].value || tiles.board[this.x2][this.y2].value || tiles.board[this.x3][this.y3].value);
     }
 
     this.canRotate = function() {
@@ -341,8 +342,12 @@ function newPiece() {
     player.placePiece();
     clearLines(findMinRow());
     player = new piece(4, 0, selectPiece());
-    player.setupPiece();
-    paintAll();
+    if(player.setupPiece()) {
+        paintAll();
+        return true;
+    }
+    return false;
+
 }
 
 function movePlayer() {
@@ -402,12 +407,20 @@ function keypress(e) {
     }
 }
 
+function displayGameOver() {
+    var go_header = document.createElement("h1");                 // Create a <li> node
+    go_header.innerText = "GAME OVER!";
+    document.body.appendChild(go_header);
+}
+
 function tick() {
     if(player.drop()) {
         movePlayer();
     } else {
-        newPiece();
-
+        if(!newPiece()) {
+            displayGameOver();
+            clearInterval(gameInterval);
+        }
     }
 }
 
