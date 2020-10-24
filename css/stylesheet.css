@@ -1,0 +1,28 @@
+#code_links_nav {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: center;
+}
+
+a {
+    text-decoration: none;
+}
+
+.thumbnail_wrapper {
+    border: 1px solid lightgrey;
+    padding: 1rem;
+    margin: 1rem;
+}
+
+.thumbnail_wrapper:hover {
+    background-color: black;
+}
+.thumbnail_image {
+    width: 100%;
+    max-width: 20rem;
+}
+
+.thumbnal_heading {
+    font-size: 1.2rem;
+    text-align: center;
+}
