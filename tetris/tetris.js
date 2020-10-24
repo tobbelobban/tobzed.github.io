@@ -31,7 +31,20 @@ function startGame() {
     document.getElementById("score").innerText = "Score: 0";
     window.addEventListener('keydown', keypress);
     window.addEventListener('keyup', keyup);
+    document.getElementById("reset_btn").addEventListener("click", resetGame);
     gameInterval = setInterval(tick, 600);
+}
+
+function resetGame() {
+    clearInterval(gameInterval);
+    score = 0;
+    document.getElementById("score").innerText = "Score: 0";
+    clearCanvas();
+    tiles.setupTiles();
+    player = new piece(4,0, selectPiece());
+    player.setupPiece();
+    paintAll();
+    gameInterval = setInterval(tick,600);
 }
 
 function clearCanvas() {
