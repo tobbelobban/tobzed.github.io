@@ -407,18 +407,12 @@ function keypress(e) {
     }
 }
 
-function displayGameOver() {
-    var go_header = document.createElement("h1");
-    go_header.innerText = "GAME OVER!";
-    document.getElementById("div").appendChild(go_header);
-}
-
 function tick() {
     if(player.drop()) {
         movePlayer();
     } else {
         if(!newPiece()) {
-            displayGameOver();
+            document.getElementById("score").innerText = "GAME OVER \nScore: " + score;
             clearInterval(gameInterval);
         }
     }
