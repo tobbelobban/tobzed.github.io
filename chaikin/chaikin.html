@@ -3,23 +3,34 @@
   <head>
     <meta charset="UTF-8">
     <title>Chaikin's Corner Cutting</title>
+    <style>
+        .wrapper {
+            display: flex;
+            flex-flow: column;
+            justify-content: center;
+        }
+      canvas {
+        border: 1px solid #000000;
+        background-color: #FFFFFF;
+        padding-left: 0;
+        padding-right: 0;
+        margin-left: auto;
+        margin-right: auto;
+        display: block;
+      }
+      p {
+          margin-left: auto;
+          margin-right: auto;
+      }
+    </style>
   </head>
-  <style>
-    canvas {
-      border: 1px solid #000000;
-      background-color: #FFFFFF;
-      position: absolute;
-      top: 0px;
-      left: 0px;
-    }
-    input {
-        position: absolute;
-        top: 50px;
-        left: 650px;
-    }
-  </style>
   <body>
-    <canvas id="canvas" width="600" height="600"></canvas>
+      <div class="wrapper">
+          <p>Place out verteces on the canvas by clicking on the canvas. To move a vertex, select it and then click where you want to place it. Unselect the vertex by clicking on it again.</p>
+          <p>The red dots indicate the corner smoothing of the algorithm.</p>
+          <canvas id="canvas" width="600" height="600"></canvas>
+      </div>
+
     <script src="chaikin.js"></script>
   </body>
 </html>

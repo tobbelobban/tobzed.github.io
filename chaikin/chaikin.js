@@ -3,6 +3,8 @@ var canvas = document.getElementById("canvas");
 
 var control_polygon = [];
 var chaikin = [];
+var selectedPoint = -1;
+var radius = 8;
 
 canvas.addEventListener("click", MouseClicked);
 
@@ -40,8 +42,8 @@ function draw_chaikin() {
 function draw_control_polygon() {
     var ctx = canvas.getContext("2d");
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.StrokeStyle = "#000000";
-    ctx.setLineDash([5,3]);
+    ctx.StrokeStyle = "#696969";
+    ctx.setLineDash([3,3]);
     ctx.beginPath();
     ctx.moveTo(control_polygon[0].x,control_polygon[0].y);
     for(var p = 1; p < control_polygon.length; p++) {
@@ -50,17 +52,48 @@ function draw_control_polygon() {
     ctx.stroke();
     ctx.fillStyle = "#0000ff";
     ctx.setLineDash([]);
-    ctx.beginPath();
     for(var p = 0; p < control_polygon.length; p++) {
+        ctx.beginPath();
         ctx.moveTo(control_polygon[p].x,control_polygon[p].y);
-        ctx.arc(control_polygon[p].x,control_polygon[p].y,8,0,2*Math.PI);
-        ctx.fill();
+        if(p == selectedPoint) {
+            ctx.fillStyle = "#00ff00";
+            ctx.arc(control_polygon[p].x,control_polygon[p].y,8,0,2*Math.PI);
+            ctx.fill();
+            ctx.fillStyle = "#0000ff";
+        } else {
+            ctx.arc(control_polygon[p].x,control_polygon[p].y,8,0,2*Math.PI);
+            ctx.fill();
+        }
     }
 }
 
 function MouseClicked(e) {
-    if(e.clientX <=canvas.width && e.clientX >= 0 && e.clientY <=canvas.height && e.clientY >= 0) {
-        control_polygon.push({x: e.clientX, y: e.clientY})
+    var unselect = false;
+    var offsetLeft = canvas.offsetLeft, offsetTop = canvas.offsetTop;
+    var xPos = e.clientX - offsetLeft, yPos = e.clientY - offsetTop;
+    if(xPos <=canvas.width && xPos >= 0 && yPos <=canvas.height && yPos >= 0) {
+        if(selectedPoint < 0) {
+            for(var p = 0; p < control_polygon.length; p++) {
+                var distance = Math.sqrt(Math.pow(control_polygon[p].x-xPos,2) + Math.pow(control_polygon[p].y-yPos,2));
+                if(distance < radius) {
+                    selectedPoint = p;
+                    break;
+                }
+            }
+        } else {
+            var distance = Math.sqrt(Math.pow(control_polygon[selectedPoint].x-xPos,2) + Math.pow(control_polygon[selectedPoint].y-yPos,2));
+            if(distance < radius) {
+                selectedPoint = -1;
+                unselect = true;
+            } else {
+                control_polygon[selectedPoint].x = xPos;
+                control_polygon[selectedPoint].y = yPos;
+            }
+        }
+
+        if(selectedPoint < 0 && !unselect) {
+            control_polygon.push({x: xPos, y: yPos});
+        }
         draw_control_polygon();
         chaikin_update();
         draw_chaikin();
