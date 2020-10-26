@@ -1,19 +1,92 @@
 
+class Line {
+    constructor(x1,y1,x2,y2,color) {
+        this.x1 = x1;
+        this.y1 = y1;
+        this.x2 = x2;
+        this.y2 = y2;
+        this.color = color;
+        this.length = Math.sqrt(Math.pow(x1-x2,2) + Math.pow(y1-y2,2));
+    }
+
+    draw() {
+        ctx.strokeStyle = this.color;
+        ctx.beginPath();
+        ctx.moveTo(this.x1,this.y1);
+        ctx.lineTo(this.x2, this.y2);
+        ctx.stroke();
+    }
+}
+
+class Rectangle {
+    constructor(x, y, width, height, color) {
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+        this.color = color;
+    }
+
+    draw() {
+        ctx.fillStyle = this.color;
+        ctx.fillRect(this.x-this.width/2, this.y-this.height/2, this.width, this.height);
+    }
+}
+
+class Circle {
+    constructor(x, y, radius, color) {
+        this.x = x;
+        this.y = y;
+        this.radius = radius;
+        this.color = color;
+    }
+
+    draw() {
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, 2*Math.PI);
+        ctx.closePath();
+        ctx.fill();
+    }
+}
+
+class Player {
+    constructor(direction, speed, rotationSpeed) {
+        this.x = canvas.width/2;
+        this.y = canvas.height/2;
+        this.direction = direction;
+        this.speed = speed;
+        this.rotationSpeed = rotationSpeed;
+        this.body = new Circle(canvas.width/2, canvas.height/2, 10, "green");
+        this.gun = new Line(canvas.width/2, canvas.height/2, canvas.width/2 + 15, canvas.height/2, "red");
+    }
+}
+
+class Bullet {
+    constructor(x, y, radius, direction, speed, color) {
+        this.bullet = new Circle(x, y, radius, color);
+        this.speed = speed;
+        this.direction = direction;
+    }
+}
+
 var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext("2d");
-var directionSpeed = 3;
-var rotationSpeed = 0.1;
-var playerDirection = 0;
 
-var bulletSpeed = 10;
 var firerate = 1000;
 var lastShot = performance.now();
 var bullets = [];
 
-var circlePos = {x: 150, y:150};
 var notGameOver = true;
-
 var dx = 0, dy = 0;
+
+var recta = new Rectangle(150, 150, 40, 20, "red");
+var circa = new Circle(560, 30, 50, "grey");
+var world_objects = [];
+world_objects.push(recta);
+world_objects.push(circa);
+
+var player = new Player(0, 3, 0.1);
 
 const keys = [
     {key: "w", pressed: false},
@@ -86,74 +159,68 @@ function keyup(e) {
     }
 }
 
-function updatePosition() {
+function positionUpdate() {
     for(const k of keys) {
         if(!k.pressed) {
             continue;
         }
         var key = k.key;
         if(key == 'w') { // forward
-            dx = -directionSpeed*Math.cos(playerDirection);
-            dy = -directionSpeed*Math.sin(playerDirection);
+            dx -= player.speed*Math.cos(player.direction);
+            dy -= player.speed*Math.sin(player.direction);
         } else if(key == 'd') { // right
-            dx = directionSpeed*Math.cos(playerDirection-Math.PI/2);
-            dy = directionSpeed*Math.sin(playerDirection-Math.PI/2);
+            dx += player.speed*Math.cos(player.direction-Math.PI/2);
+            dy += player.speed*Math.sin(player.direction-Math.PI/2);
         } else if(key == 's') { // backwards
-            dx = directionSpeed*Math.cos(playerDirection);
-            dy = directionSpeed*Math.sin(playerDirection);
+            dx += player.speed*Math.cos(player.direction);
+            dy += player.speed*Math.sin(player.direction);
         } else if(key == 'a') { // left
-            dx = directionSpeed*Math.cos(playerDirection+Math.PI/2);
-            dy = directionSpeed*Math.sin(playerDirection+Math.PI/2);
+            dx += player.speed*Math.cos(player.direction+Math.PI/2);
+            dy += player.speed*Math.sin(player.direction+Math.PI/2);
         } else if(key == "ArrowRight") { // rotate clockwise
-            playerDirection += rotationSpeed;
+            player.direction += player.rotationSpeed;
         } else if(key == "ArrowLeft") { // rotate counter clockwise
-            playerDirection -= rotationSpeed;
+            player.direction -= player.rotationSpeed;
         } else if(key == " ") { // space, shoot
             if(performance.now() - lastShot > firerate) {
                 lastShot = performance.now();
-                bullets.push({x: canvas.width/2, y: canvas.height/2, speed: bulletSpeed, direction: playerDirection});
+                bullets.push(new Bullet(player.gun.x2, player.gun.y2, 3, player.direction, 10, "black"));
             }
         }
     }
 
 }
 
-function updateWorld() {
-    circlePos.x += dx;
-    circlePos.y += dy;
-    dx = 0, dy = 0;
+function updateObjects() {
+    for(obj of world_objects) {
+        obj.x += dx;
+        obj.y += dy;
+    }
 }
 
-function drawPlayer() {
-    ctx.fillStyle = "green";
-    ctx.beginPath();
-    ctx.arc(400,300, 10, 0, 2*Math.PI);
-    ctx.closePath();
-    ctx.fill();
-
-    ctx.strokeStyle = "red";
-    ctx.beginPath();
-    ctx.moveTo(canvas.width/2,canvas.height/2);
-    ctx.lineTo(canvas.width/2 + Math.cos(playerDirection)*15, canvas.height/2 + Math.sin(playerDirection)*15);
-    ctx.stroke();
-}
-
-function drawBullets() {
+function updateBullets() {
     var new_bullets = [];
-    ctx.fillStyle = "black";
     for(var i = 0; i < bullets.length; i++) {
-        if(bullets[i].x < 0 || bullets[i].x > canvas.width || bullets[i].y < 0 || bullets[i].y > canvas.height ) {
+        if(bullets[i].bullet.x < 0 || bullets[i].bullet.x > canvas.width || bullets[i].bullet.y < 0 || bullets[i].bullet.y > canvas.height ) {
             continue;
         }
-        var newx = bullets[i].x + Math.cos(bullets[i].direction)*bullets[i].speed;
-        var newy = bullets[i].y + Math.sin(bullets[i].direction)*bullets[i].speed;
-        new_bullets.push({x:newx, y: newy, speed: bullets[i].speed, direction: bullets[i].direction});
-        ctx.beginPath();
-        ctx.arc(newx, newy, 3, 0, 2*Math.PI);
-        ctx.closePath();
-        ctx.fill();
+        bullets[i].bullet.x += Math.cos(bullets[i].direction)*bullets[i].speed + dx;
+        bullets[i].bullet.y += Math.sin(bullets[i].direction)*bullets[i].speed + dy;
+        new_bullets.push(bullets[i]);
     }
     bullets = new_bullets;
+}
+
+function updatePlayer() {
+    player.gun.x2 = player.gun.length * Math.cos(player.direction) + player.x;
+    player.gun.y2 = player.gun.length * Math.sin(player.direction) + player.y;
+}
+
+function updateWorld() {
+    updateObjects();
+    updateBullets();
+    updatePlayer();
+    dx = 0, dy = 0;
 }
 
 function clearCanvas() {
@@ -161,15 +228,31 @@ function clearCanvas() {
     ctx.fillRect(0,0,canvas.width, canvas.height);
 }
 
+function drawWorld() {
+    for(const obj of world_objects) {
+        obj.draw();
+    }
+}
+
+function drawPlayer() {
+    player.body.draw();
+    player.gun.draw();
+}
+
+function drawBullets() {
+    for(const b of bullets) {
+        b.bullet.draw();
+    }
+}
+
 function draw() {
-    ctx.fillStyle = "blue";
-    ctx.fillRect(circlePos.x, circlePos.y, 30, 30);
+    drawWorld();
     drawPlayer();
     drawBullets();
 }
 
 function gameLoop() {
-    updatePosition();
+    positionUpdate();
     updateWorld();
     clearCanvas();
     draw();
