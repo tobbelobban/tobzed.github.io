@@ -22,7 +22,7 @@ function circleCollidingWithRectangle(circle, rect, dx, dy) {
     if (vert_dist - dy <= (rect.height / 2)) return true;
 
     let cornerDistance_sq =
-         ((hori_dist - dx - rect.width / 2) ** 2) +
+        ((hori_dist - dx - rect.width / 2) ** 2) +
         ((vert_dist - dy - rect.height / 2) ** 2);
 
     return (cornerDistance_sq < (circle.radius ** 2));
@@ -48,7 +48,7 @@ function isColliding(obj1, obj2, dx, dy) {
         } else {
             return circleCollidingWithRectangle(obj2, obj1, dx, dy);
         }
-        
+
     } else if (obj1 instanceof Circle) {
         if (obj2 instanceof Rectangle) {
             return circleCollidingWithRectangle(obj1, obj2, dx, dy);
@@ -181,7 +181,7 @@ class Player {
     shoot() {
         this.bullets.push(new Bullet(this.gun.p2.x, this.gun.p2.y, 3, this.direction, 10, "black"));
         this.lastShot = performance.now();
-    }   
+    }
 }
 
 /*
@@ -291,7 +291,7 @@ function positionUpdate() {
 function checkPlayerCollision() {
     for (let p of players) {
         for (const obj of world_objects) {
-            if (possibleObjectCollision(p.body,obj)) {
+            if (possibleObjectCollision(p.body, obj)) {
                 if (isColliding(p.body, obj, p.dx, p.dy)) {
                     p.dx *= 0.04;
                     p.dy *= 0.04;
@@ -318,15 +318,15 @@ function updateBullets() {
                     break;
                 }
             }
-            
+
             if (bulletHit || bullet.x < -CANVAS_WIDTH / 2 || bullet.x > CANVAS_WIDTH / 2 || bullet.y < -CANVAS_HEIGHT / 2 || bullet.y > CANVAS_HEIGHT / 2) {
                 players[p].bullets.splice(i, 1);
                 continue;
-            } 
+            }
             players[p].bullets[i].move(Math.cos(bullet.direction) * bullet.speed + players[0].dx, Math.sin(bullet.direction) * bullet.speed + players[0].dy);
         }
     }
-    
+
 }
 
 function updatePlayer() {
@@ -385,7 +385,7 @@ function startGame() {
     window.addEventListener("keydown", keydown);
     window.addEventListener("keyup", keyup);
     init_world();
-    gameloop = setInterval(gameLoop, 100 / 6);   
+    gameloop = setInterval(gameLoop, 100 / 6);
 }
 
 function gameLoop() {
