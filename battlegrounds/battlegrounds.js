@@ -394,5 +394,4 @@ function gameLoop() {
     updateWorld();
     clearCanvas();
     draw();
-    console.log(players[0].bullets.length);
 }
