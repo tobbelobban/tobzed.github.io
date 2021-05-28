@@ -157,7 +157,7 @@ class Bullet extends Circle {
     constructor(x, y, radius, direction, speed, color) {
         super(x, y, radius, color);
         this.speed = speed;
-        this.direction = direction;        
+        this.direction = direction;
     }
 }
 
