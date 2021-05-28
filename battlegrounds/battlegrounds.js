@@ -58,6 +58,14 @@ function isColliding(obj1, obj2, dx, dy) {
     }
 }
 
+function outsideCanvas(obj) {
+    if (obj.bb_min.x > CANVAS_WIDTH / 2) return true;
+    if (obj.bb_min.y > CANVAS_HEIGHT / 2) return true;
+    if (obj.bb_max.x < -CANVAS_WIDTH / 2) return true;
+    if (obj.bb_max.y < -CANVAS_HEIGHT / 2) return true;
+    return false;
+}
+
 class Point {
     constructor(x, y) {
         this.x = x;
@@ -149,7 +157,7 @@ class Bullet extends Circle {
     constructor(x, y, radius, direction, speed, color) {
         super(x, y, radius, color);
         this.speed = speed;
-        this.direction = direction;
+        this.direction = direction;        
     }
 }
 
@@ -161,10 +169,20 @@ class Player {
         this.dx = 0;
         this.firerate = 10;
         this.lastShot = performance.now() - 1000;
+        this.magCapacity = 5;
+        this.magCount = this.magCapacity;
         this.bullets = [];
         this.rotationSpeed = rotationSpeed;
         this.body = new Circle(0, 0, 10, "green");
         this.gun = new Line(0, 0, 15, 0, "red");
+    }
+
+    reload() {
+        this.magCount = this.magCapacity;
+    }
+
+    isLoaded() {
+        return (this.magCount > 0);
     }
 
     draw() {
@@ -173,13 +191,14 @@ class Player {
     }
 
     tryShoot() {
-        if (performance.now() - this.lastShot > (1000 / this.firerate)) {
+        if (performance.now() - this.lastShot > (1000 / this.firerate) && this.isLoaded()) {
             this.shoot();
         }
     }
 
     shoot() {
-        this.bullets.push(new Bullet(this.gun.p2.x, this.gun.p2.y, 3, this.direction, 10, "black"));
+        this.bullets.push(new Bullet(this.gun.p2.x, this.gun.p2.y, 3, this.direction, 7, "black"));
+        this.magCount -= 1;
         this.lastShot = performance.now();
     }
 }
@@ -198,6 +217,7 @@ const keys = [
     { key: "s", pressed: false },
     { key: "a", pressed: false },
     { key: "d", pressed: false },
+    { key: "r", pressed: false },
     { key: "ArrowRight", pressed: false },
     { key: "ArrowLeft", pressed: false },
     { key: " ", pressed: false },
@@ -217,14 +237,17 @@ function keydown(e) {
         case "d":
             keys[3].pressed = true;
             break;
-        case "ArrowRight":
+        case "r":
             keys[4].pressed = true;
             break;
-        case "ArrowLeft":
+        case "ArrowRight":
             keys[5].pressed = true;
             break;
-        case " ":
+        case "ArrowLeft":
             keys[6].pressed = true;
+            break;
+        case " ":
+            keys[7].pressed = true;
             break;
         default:
             break;
@@ -245,14 +268,17 @@ function keyup(e) {
         case "d":
             keys[3].pressed = false;
             break;
-        case "ArrowRight":
+        case "r":
             keys[4].pressed = false;
             break;
-        case "ArrowLeft":
+        case "ArrowRight":
             keys[5].pressed = false;
             break;
-        case " ":
+        case "ArrowLeft":
             keys[6].pressed = false;
+            break;
+        case " ":
+            keys[7].pressed = false;
             break;
         default:
             break;
@@ -278,6 +304,8 @@ function positionUpdate() {
         } else if (key == 'a') { // left
             players[0].dx += players[0].speed * Math.cos(players[0].direction + Math.PI / 2);
             players[0].dy += players[0].speed * Math.sin(players[0].direction + Math.PI / 2);
+        } else if (key == "r") { // reload
+            players[0].reload();
         } else if (key == "ArrowRight") { // rotate clockwise
             players[0].direction += players[0].rotationSpeed;
         } else if (key == "ArrowLeft") { // rotate counter clockwise
@@ -310,23 +338,22 @@ function updateObjects() {
 function updateBullets() {
     for (var p = 0; p < players.length; p++) {
         for (var i = 0; i < players[p].bullets.length; i++) {
+            let bullet = players[p].bullets.shift();
             let bulletHit = false;
-            let bullet = players[p].bullets[i];
             for (const obj of world_objects) {
                 if (possibleObjectCollision(bullet, obj) && isColliding(bullet, obj, 0, 0)) {
                     bulletHit = true;
                     break;
                 }
             }
-
-            if (bulletHit || bullet.x < -CANVAS_WIDTH / 2 || bullet.x > CANVAS_WIDTH / 2 || bullet.y < -CANVAS_HEIGHT / 2 || bullet.y > CANVAS_HEIGHT / 2) {
-                players[p].bullets.splice(i, 1);
+            if (bulletHit || outsideCanvas(bullet)) {
                 continue;
+            } else {
+                bullet.move(Math.cos(bullet.direction) * bullet.speed + players[0].dx, Math.sin(bullet.direction) * bullet.speed + players[0].dy);
+                players[p].bullets.push(bullet);
             }
-            players[p].bullets[i].move(Math.cos(bullet.direction) * bullet.speed + players[0].dx, Math.sin(bullet.direction) * bullet.speed + players[0].dy);
         }
     }
-
 }
 
 function updatePlayer() {
@@ -394,5 +421,4 @@ function gameLoop() {
     updateWorld();
     clearCanvas();
     draw();
-    console.log(players[0].bullets.length);
 }
