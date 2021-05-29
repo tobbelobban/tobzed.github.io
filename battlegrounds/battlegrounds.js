@@ -6,7 +6,8 @@ var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext("2d");
 const CANVAS_HEIGHT = canvas.height;
 const CANVAS_WIDTH = canvas.width;
-var drawBB = true;
+var drawBB = false;
+
 /*
     BEGIN CLASS DEFS
 */
@@ -392,6 +393,16 @@ function drawBullets() {
     }
 }
 
+function updateBulletCount() {
+    let txt = "Bullets x " + players[0].magCount;
+    if(players[0].magCount > 0) {
+        document.getElementById("bullets").innerText = txt;
+    } else {
+        document.getElementById("bullets").innerText = txt + ("\nRELOAD (r)");
+    }
+    
+}
+
 function draw() {
     drawWorld();
     drawPlayers();
@@ -420,5 +431,6 @@ function gameLoop() {
     checkPlayerCollision();
     updateWorld();
     clearCanvas();
+    updateBulletCount();
     draw();
 }
