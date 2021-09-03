@@ -433,7 +433,6 @@ function tick() {
     }
     if(score == nextGoal) {
         nextGoal += 20;
-        speed += 1;
     }
 }
 
