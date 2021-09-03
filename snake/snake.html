@@ -1,74 +1,82 @@
 <canvas id="canvas" width="400" height="400"></canvas>
 <h1 id="score"> SCORE: 0</h1>
+
 <script>
 
-snake_x = 9, snake_y = 9;
-apple_x = 12, apple_y = 12;
-next_lvl = 10;
-x_vel = 0, y_vel = 0;
-px_len = 20;
-tail_length = 4;
-speed = 1000 / 15;
-tail = [];
-tile_count = canvas.width / px_len;
-score = 0;
-pressed = false;
-  
+// some variables
+var head_x = 9;
+var head_y = 9;
+var new_x = head_x;
+var new_y = head_y;
+var apple_x = 12;
+var apple_y = 12;
+var next_lvl = 10;
+var x_vel = 0;
+var y_vel = 0;
+var px_len = 20;
+var tail_length = 5;
+var speed = 1000 / 15;
+var tail = [];
+var tile_count = canvas.width / px_len;
+var score = 0;
+var pressed = false;
+var new_score = false;
+var game_interval;
+
 window.onload = function() {
   canvas = document.getElementById("canvas");
   ctx = canvas.getContext("2d");
   document.addEventListener("keydown", pushed_key);
-  game_interval = setInterval(game,speed);
+  reset();
 };
 
 function reset() {
-  tail_length = 4;
-  move();
+  clearInterval(game_interval);
+  tail_length = 3;
   score = 0;
   next_lvl = 10;
   speed = 1000/15;
   x_vel = 0;
   y_vel = 0;
-  clearInterval(game_interval);
   document.getElementById("score").innerHTML = "SCORE: 0";
   game_interval = setInterval(game,speed);
 }
+
+function game() {
+  //check if next move killed snake x_x
+  new_x = head_x + x_vel;
+  new_y = head_y + y_vel;
+  if(new_x < 0) {
+    new_x = tile_count - 1;
+  } else if(new_x >= tile_count) {
+    new_x = 0;
+  } else if(new_y < 0) {
+    new_y = tile_count - 1;
+  } else if(new_y >= tile_count) {
+    new_y = 0;
+  }
+  for(var i = 0; i < tail.length; i++) {
+    if(new_x == tail[i].x && new_y == tail[i].y && i != tail.length-1) {
+      reset();
+    }
+  }
   
-function move() {
-  tail.push({x:snake_x,y:snake_y});
+  //snake not dead, let's move :D
+  tail.push({x:head_x,y:head_y});
   while(tail.length > tail_length) {
       tail.shift();
   }
-}
+  head_x = new_x;
+  head_y = new_y;
 
-function game() {
-  snake_x += x_vel;
-  snake_y += y_vel;
-  if(snake_x < 0) {
-    snake_x = tile_count - 1;
-  } else if(snake_x >= tile_count) {
-    snake_x = 0;
-  } else if(snake_y < 0) {
-    snake_y = tile_count - 1;
-  } else if(snake_y >= tile_count) {
-    snake_y = 0;
-  }
-  ctx.fillStyle = "black";
-  ctx.fillRect(0,0,canvas.width,canvas.height);
-  ctx.fillStyle = "orange";
-  for(var i = 0; i < tail.length; i++) {
-    ctx.fillRect(tail[i].x*px_len,tail[i].y*px_len-1,px_len,px_len-1);
-    if(snake_x == tail[i].x && snake_y == tail[i].y) {
-      reset();
-      return;
-    }
-  }
-  move();
+  pressed = false;
 
-  if(snake_x == apple_x && snake_y == apple_y) {
+  // check if snake ate apple
+  if(head_x == apple_x && head_y == apple_y) {
     tail_length++;
     score++;
-    document.getElementById("score").innerHTML = "SCORE: " + score;
+    new_score = true;
+    
     var placed_apple = false;
     while(!placed_apple) {
       apple_x = Math.floor(Math.random()*20);
@@ -82,10 +90,32 @@ function game() {
       }
     }
   }
+  
+  if(new_score) {
+    document.getElementById("score").innerHTML = "SCORE: " + score;
+    new_score = false;
+  }
+  
+  // repaint entire canvas
+  ctx.fillStyle = "black";
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  
+  // paint snake's tail
+  ctx.fillStyle = "orange";
+  for(var i = 0; i < tail.length; i++) {
+    ctx.fillRect(tail[i].x*px_len + 1,tail[i].y*px_len + 1,px_len - 1,px_len - 1);
+  }
+
+  // paint snake's head
+  ctx.fillStyle = "green";
+  ctx.fillRect(head_x*px_len + 1,head_y*px_len + 1,px_len - 1,px_len - 1);
+
+  // paint apple
   ctx.fillStyle = "red";
-  ctx.fillRect(apple_x*px_len,apple_y*px_len-1,px_len,px_len-1);
+  ctx.fillRect(apple_x*px_len + 1,apple_y*px_len + 1,px_len - 1,px_len - 1);
   pressed = false;
   
+  // update game difficulty
   if(score >= next_lvl) {
     clearInterval(game_interval);
     speed -= speed*0.25;
@@ -95,6 +125,7 @@ function game() {
 }
 
 function pushed_key(event) {
+  //console.log("key pressed!");
   if(pressed) return;
   switch(event.keyCode) {
     case 37:
@@ -127,4 +158,5 @@ function pushed_key(event) {
       break;
   }
 }
+
 </script>
