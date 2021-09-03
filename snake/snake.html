@@ -23,6 +23,7 @@ window.onload = function() {
 
 function reset() {
   tail_length = 4;
+  move();
   score = 0;
   next_lvl = 10;
   speed = 1000/15;
@@ -33,6 +34,13 @@ function reset() {
   game_interval = setInterval(game,speed);
 }
   
+function move() {
+  tail.push({x:snake_x,y:snake_y});
+  while(tail.length > tail_length) {
+      tail.shift();
+  }
+}
+
 function game() {
   snake_x += x_vel;
   snake_y += y_vel;
@@ -55,10 +63,7 @@ function game() {
       return;
     }
   }
-  tail.push({x:snake_x,y:snake_y});
-  while(tail.length > tail_length) {
-      tail.shift();
-  }
+  move();
 
   if(snake_x == apple_x && snake_y == apple_y) {
     tail_length++;
