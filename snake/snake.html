@@ -56,7 +56,7 @@ function game() {
     new_y = 0;
   }
   for(var i = 0; i < tail.length; i++) {
-    if(new_x == tail[i].x && new_y == tail[i].y && i != tail.length-1) {
+    if(new_x == tail[i].x && new_y == tail[i].y && i != 0) {
       reset();
     }
   }
