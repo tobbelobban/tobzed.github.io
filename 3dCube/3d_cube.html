@@ -24,7 +24,9 @@ window.onload = function() {
           ];
   canvas = document.getElementById("canvas");
   ctx = canvas.getContext("2d");
-  cam_pos = -2;
+  cam_pos = -5;
+  cam_max = -4;
+  cam_min = -10;
   show_faces = true;
   document.addEventListener("keydown", pushed_key);
   draw();
@@ -67,8 +69,8 @@ function rotate_z(theta) {
 function draw() {
   let tmp_points = [];
   vertices.forEach(v => {
-    let x = v[0]/(v[2]-cam_pos) * 50 + 200;
-    let y = v[1]/(v[2]-cam_pos) * 50 + 200;
+    let x = v[0]/(v[2]-cam_pos) * 500 + 200;
+    let y = v[1]/(v[2]-cam_pos) * 500 + 200;
     tmp_points.push([x,y]);
   });
   ctx.fillStyle = 'black';
@@ -102,10 +104,12 @@ function pushed_key(event) {
 
   switch(event.keyCode) {
     case 38:
-        cam_pos += 0.1;
+        if(cam_pos < cam_max)
+          cam_pos += 0.1;
         break;
     case 40:
-        cam_pos -= 0.1;
+        if(cam_pos > cam_min)
+          cam_pos -= 0.1;
         break;
 
 
