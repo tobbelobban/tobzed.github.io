@@ -7,6 +7,8 @@ var released = true;
 var score = 0;
 var nextGoal = 20;
 var piecePlaced = 0;
+var tickSpeed = 600;
+var level = 1;
 
 var tiles = {
     setupTiles : function() {
@@ -34,19 +36,26 @@ function startGame() {
     window.addEventListener('keydown', keypress);
     window.addEventListener('keyup', keyup);
     document.getElementById("reset_btn").addEventListener("click", resetGame);
-    gameInterval = setInterval(tick, 600);
+    document.getElementById("next_level").innerText = "Next level: " + nextGoal;
+    document.getElementById("level").innerText = "Level: " + level;
+    gameInterval = setInterval(tick, tickSpeed);
 }
 
 function resetGame() {
     clearInterval(gameInterval);
     score = 0;
-    document.getElementById("score").innerText = "Score: 0";
+    nextGoal = 20;
+    level = 1;
+    tickSpeed = 600;
+    document.getElementById("score").innerText = "Score: " + score;
+    document.getElementById("level").innerText = "Level: " + level;
+    document.getElementById("next_level").innerText = "Next level: " + nextGoal;
     clearCanvas();
     tiles.setupTiles();
     player = new piece(4,0, selectPiece());
     player.setupPiece();
     paintAll();
-    gameInterval = setInterval(tick,600);
+    gameInterval = setInterval(tick,tickSpeed);
 }
 
 function clearCanvas() {
@@ -431,8 +440,14 @@ function tick() {
             clearInterval(gameInterval);
         }
     }
-    if(score == nextGoal) {
+    if(score >= nextGoal) {
         nextGoal += 20;
+        level += 1
+        document.getElementById("next_level").innerText = "Next level: " + nextGoal;
+        document.getElementById("level").innerText = "Level: " + level;
+        clearInterval(gameInterval);
+        tickSpeed *= 0.7;
+        gameInterval = setInterval(tick,tickSpeed);
     }
 }
 
