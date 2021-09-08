@@ -69,11 +69,36 @@ h1 {
 }
 
 h2 {
+    padding: 0;
+    margin: .8rem 1rem;
     font-size: 2.25rem;
 }
 
 h3 {
+    padding: 0;
+    margin: .8rem 1rem;
     font-size: 1.6rem;
+}
+
+h4, p {
+    padding: 0;
+    margin: .8rem 1rem;
+}
+
+.dark-bgd {
+    display: inline;
+    background-color: #575757;
+    color: white;
+    line-height: 1.5rem;
+    font-size: 1.2rem;
+    font-weight: bolder;
+    padding: 0rem .5rem;
+}
+
+.green-bgd {
+    color: black;
+    background-color: #54c38c;
+    padding: .2rem 0rem .2rem .5rem;
 }
 
 #games_wrapper {
@@ -86,6 +111,11 @@ h3 {
     border: none;
     padding: 2rem;
     margin: 1rem;
+}
+
+.thumbnail_wrapper:hover {
+    border: 1px solid black;
+
 }
 
 .thumbnail_wrapper > a {
