@@ -1,0 +1,131 @@
+
+
+/*
+    the responsive design for small screens is supplied by css-tricks:
+    https://css-tricks.com/responsive-data-tables/
+*/
+
+table, thead, tbody, th, td, tr {
+    display: block;
+}
+
+table {
+    border-collapse: collapse;
+    font-size: larger;
+    margin: 1rem;
+    color: black;
+}
+
+tr:nth-of-type(even) {
+    background-color: #E3E3E3;
+}
+
+tr:nth-of-type(odd) {
+    background-color: #cfb5fc;
+}
+
+td, th {
+    padding: .5rem;
+    border: 1px solid white;
+}
+
+
+thead tr {
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
+}
+
+td {
+    border: 1px solid white; 
+    position: relative;
+    padding-left: 50%; 
+    word-break: break-all;
+}
+
+td::before {
+    position: absolute;
+    top: 6px; /* position the "new" table headers so they align with the data */
+    left: 6px;
+    width: 45%; 
+    padding-right: 10px; 
+    white-space: nowrap;
+    font-weight: bold;
+}
+
+/*
+    Here we must hard-code specific headers for each new table
+*/
+
+/* weather-table*/
+#weather-table td:nth-of-type(1)::before {content: "Klockan";}
+#weather-table td:nth-of-type(2)::before {content: "Temp";}
+#weather-table td:nth-of-type(3)::before {content: "Vindstyrka";}
+#weather-table td:nth-of-type(4)::before {content: "Vindriktning";}
+#weather-table td:nth-of-type(5)::before {content: "Himmel";}
+
+/* membership-table*/
+#membership-table td:nth-of-type(1)::before {content: "Förnamn";}
+#membership-table td:nth-of-type(2)::before {content: "Efternamn";}
+#membership-table td:nth-of-type(3)::before {content: "Mailadress";}
+#membership-table td:nth-of-type(4)::before {content: "Telefon";}
+
+/* at screenw-dith of 581px minimum we can display table as usual */
+@media only screen and (min-width: 581px) {
+
+    thead, tbody, tr, td, th {
+        display: initial;        
+    }
+
+    table {
+        margin-top: 1rem;
+        padding: 0;
+    }
+
+    thead {
+        display: table-header-group;
+    }
+
+    tbody {
+        display: table-row-group;
+    }
+
+    tr {
+        display: table-row;
+    }
+
+    tr:nth-of-type(even) {
+        background-color: white;
+    }
+
+    td, th {
+        display: table-cell;
+        padding: 0;
+    }
+    
+    td {
+        padding: 1rem;
+    }
+
+    td::before {
+        display: none;
+    }
+
+    thead tr {
+        position: initial;
+    }
+    thead th {
+        padding: 1rem;
+    }
+
+    th {
+        background-color: #D4C4D9;
+        color: black;
+        font-weight: bold;
+    }
+
+    tr:hover {
+        background-color: #575757;
+        color: white;
+    }
+}
