@@ -27,6 +27,7 @@ header {
     display: flex;
     flex-flow: row wrap;
     justify-content: space-evenly;
+    border-bottom: 1px solid #D3D3D3;
 }
 
 #menu-nav > a {
@@ -118,6 +119,7 @@ h3 {
         display: flex;
         flex-flow: column;
         justify-content: flex-start;
+        border-bottom: none;
         border-right: 1px solid #D3D3D3;
     }
 }
