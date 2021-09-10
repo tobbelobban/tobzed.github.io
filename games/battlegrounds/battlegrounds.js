@@ -1,51 +1,50 @@
-/*
-    SETUP CANVAS AND 2D CONTEX
-*/
 
 var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext("2d");
 const CANVAS_HEIGHT = canvas.height;
 const CANVAS_WIDTH = canvas.width;
-var drawBB = false;
+let drawBB = false;
 
-/*
-    BEGIN CLASS DEFS
-*/
+let worldObjects = [];
+let worldBullets = [];
+let player;
+let gameloop;
+let player_dx, player_dy;
 
 function circleCollidingWithRectangle(circle, rect, dx, dy) {
-    let hori_dist = Math.abs(circle.center.x - rect.center.x);
-    let vert_dist = Math.abs(circle.center.y - rect.center.y);
+    let hori_dist = Math.abs(circle.center.x - rect.center.x + dx);
+    let vert_dist = Math.abs(circle.center.y - rect.center.y + dy);
 
-    if (hori_dist - dx > (rect.width / 2 + circle.radius)) return false;
-    if (vert_dist - dy > (rect.height / 2 + circle.radius)) return false;
+    if (hori_dist > (rect.width/2 + circle.radius)) return false;
+    if (vert_dist > (rect.height/2 + circle.radius)) return false;
 
-    if (hori_dist - dx <= (rect.width / 2)) return true;
-    if (vert_dist - dy <= (rect.height / 2)) return true;
+    if (hori_dist <= (rect.width/2)) return true;
+    if (vert_dist <= (rect.height/2)) return true;
 
     let cornerDistance_sq =
-        ((hori_dist - dx - rect.width / 2) ** 2) +
-        ((vert_dist - dy - rect.height / 2) ** 2);
+        ((hori_dist - rect.width / 2) ** 2) +
+        ((vert_dist - rect.height / 2) ** 2);
 
     return (cornerDistance_sq < (circle.radius ** 2));
 }
 
 function circleCollidingWithCirlce(circle1, circle2, dx, dy) {
-    let sq_dist = ((circle1.center.x - circle2.center.x - dx) ** 2) + ((circle1.center.y - circle2.center.y - dy) ** 2);
+    let sq_dist = ((circle1.center.x - circle2.center.x + dx) ** 2) + ((circle1.center.y - circle2.center.y + dy) ** 2);
     return (sq_dist < ((circle1.radius + circle2.radius) ** 2));
 }
 
-function possibleObjectCollision(obj1, obj2) {
-    if (obj1.bb_min.x - obj2.bb_max.x > 0) return false; // player is right of obj if > 0
-    if (obj1.bb_min.y - obj2.bb_max.y > 0) return false; // player is "under" obj if > 0
-    if (obj2.bb_min.x - obj1.bb_max.x > 0) return false; // player is left of obj if > 0
-    if (obj2.bb_min.y - obj1.bb_max.y > 0) return false; // player is "above" obj if > 0
+function possibleObjectCollision(obj1, obj2, dx, dy) {
+    if (obj1.bb_min.x - obj2.bb_max.x + dx >= 0) return false; // obj1 is right of obj2 if > 0
+    if (obj1.bb_min.y - obj2.bb_max.y + dy >= 0) return false; // obj1 is under obj2 if > 0
+    if (obj1.bb_max.x - obj2.bb_min.x + dx <= 0) return false; // obj1 is left of obj2 if > 0
+    if (obj1.bb_max.y - obj2.bb_min.y + dy <= 0) return false; // obj1 is above obj2 if > 0
     return true;
 }
 
 function isColliding(obj1, obj2, dx, dy) {
     if (obj1 instanceof Rectangle) {
         if (obj2 instanceof Rectangle) {
-            return possibleObjectCollision(obj1, obj2);
+            return possibleObjectCollision(obj1, obj2, dx, dy);
         } else {
             return circleCollidingWithRectangle(obj2, obj1, dx, dy);
         }
@@ -57,6 +56,10 @@ function isColliding(obj1, obj2, dx, dy) {
             return circleCollidingWithCirlce(obj1, obj2, dx, dy);
         }
     }
+}
+
+function checkCollision(obj1, obj2, dx, dy) {
+    return possibleObjectCollision(obj1, obj2, dx, dy) && isColliding(obj1, obj2, dx, dy);
 }
 
 function outsideCanvas(obj) {
@@ -119,10 +122,10 @@ class Rectangle {
     draw() {
         ctx.fillStyle = this.color;
         ctx.fillRect(this.bb_min.x + CANVAS_WIDTH / 2, this.bb_min.y + CANVAS_HEIGHT / 2, this.width, this.height);
-        //if (drawBB) {
-        //    ctx.strokeStyle = "black";
-        //    ctx.strokeRect(this.bb_min.x + CANVAS_WIDTH / 2, this.bb_min.y + CANVAS_HEIGHT / 2, this.width, this.height);
-        //}
+        if (drawBB) {
+            ctx.strokeStyle = "black";
+            ctx.strokeRect(this.bb_min.x + CANVAS_WIDTH / 2, this.bb_min.y + CANVAS_HEIGHT / 2, this.width, this.height);
+        }
     }
 }
 
@@ -147,10 +150,10 @@ class Circle {
         ctx.arc(this.center.x + CANVAS_WIDTH / 2, this.center.y + CANVAS_HEIGHT / 2, this.radius, 0, 2 * Math.PI);
         ctx.closePath();
         ctx.fill();
-        //if (drawBB) {
-        //    ctx.strokeStyle = "black";
-        //    ctx.strokeRect(this.bb_min.x + CANVAS_WIDTH / 2, this.bb_min.y + CANVAS_HEIGHT / 2, this.bb_max.x - this.bb_min.x, this.bb_max.y - this.bb_min.y);
-        //}
+        if (drawBB) {
+            ctx.strokeStyle = "black";
+            ctx.strokeRect(this.bb_min.x + CANVAS_WIDTH / 2, this.bb_min.y + CANVAS_HEIGHT / 2, this.bb_max.x - this.bb_min.x, this.bb_max.y - this.bb_min.y);
+        }
     }
 }
 
@@ -162,20 +165,14 @@ class Bullet extends Circle {
     }
 }
 
-class Player {
-    constructor(direction, speed, rotationSpeed) {
-        this.direction = direction;
-        this.speed = speed;
-        this.dy = 0;
-        this.dx = 0;
+class Gun extends Line {
+    constructor(x1, y1, x2, y2, direction, color) {
+        super(x1, y1, x2, y2, color);
         this.firerate = 10;
-        this.lastShot = performance.now() - 1000;
-        this.magCapacity = 5;
+        this.magCapacity = 10;
+        this.direction = direction;
         this.magCount = this.magCapacity;
-        this.bullets = [];
-        this.rotationSpeed = rotationSpeed;
-        this.body = new Circle(0, 0, 10, "green");
-        this.gun = new Line(0, 0, 15, 0, "red");
+        this.lastShot = performance.now() - 1000;
     }
 
     reload() {
@@ -186,9 +183,10 @@ class Player {
         return (this.magCount > 0);
     }
 
-    draw() {
-        this.body.draw();
-        this.gun.draw();
+    rotate(v) {
+        this.direction += v;
+        this.p2.x = this.length * Math.cos(this.direction);
+        this.p2.y = this.length * Math.sin(this.direction);
     }
 
     tryShoot() {
@@ -198,20 +196,30 @@ class Player {
     }
 
     shoot() {
-        this.bullets.push(new Bullet(this.gun.p2.x, this.gun.p2.y, 3, this.direction, 7, "black"));
+        worldBullets.push(new Bullet(this.p2.x, this.p2.y, 3, this.direction, 7, "black"));
         this.magCount -= 1;
         this.lastShot = performance.now();
     }
 }
 
-/*
-    BEGIN EXECUTION
-*/
+class Player {
+    constructor(direction, speed, rotationSpeed) {
+        this.direction = direction;
+        this.speed = speed;
+        this.rotationSpeed = rotationSpeed;
+        this.body = new Circle(0, 0, 10, "green");
+        this.gun = new Gun(0, 0, 15, 0, direction, "red");
+    }
 
-var world_objects = [];
-var players = [];
-var gameloop;
-startGame();
+    rotate(v) {
+        this.direction += v;
+    }
+
+    updateDirection(v) {
+        this.rotate(v);
+        this.gun.rotate(v);
+    }
+}
 
 const keys = [
     { key: "w", pressed: false },
@@ -286,86 +294,79 @@ function keyup(e) {
     }
 }
 
-function positionUpdate() {
-    players[0].dx = players[0].dy = 0;
+function playerUpdate() {
+    player_dx = 0;
+    player_dy = 0;
     for (const k of keys) {
         if (!k.pressed) {
             continue;
         }
         var key = k.key;
         if (key == 'w') { // forward
-            players[0].dx -= players[0].speed * Math.cos(players[0].direction);
-            players[0].dy -= players[0].speed * Math.sin(players[0].direction);
+            player_dx += player.speed * Math.cos(player.direction);
+            player_dy += player.speed * Math.sin(player.direction);
         } else if (key == 'd') { // right
-            players[0].dx += players[0].speed * Math.cos(players[0].direction - Math.PI / 2);
-            players[0].dy += players[0].speed * Math.sin(players[0].direction - Math.PI / 2);
+            player_dx += player.speed * Math.cos(player.direction + Math.PI / 2);
+            player_dy += player.speed * Math.sin(player.direction + Math.PI / 2);
         } else if (key == 's') { // backwards
-            players[0].dx += players[0].speed * Math.cos(players[0].direction);
-            players[0].dy += players[0].speed * Math.sin(players[0].direction);
+            player_dx -= player.speed * Math.cos(player.direction);
+            player_dy -= player.speed * Math.sin(player.direction);
         } else if (key == 'a') { // left
-            players[0].dx += players[0].speed * Math.cos(players[0].direction + Math.PI / 2);
-            players[0].dy += players[0].speed * Math.sin(players[0].direction + Math.PI / 2);
+            player_dx += player.speed * Math.cos(player.direction - Math.PI / 2);
+            player_dy += player.speed * Math.sin(player.direction - Math.PI / 2);
         } else if (key == "r") { // reload
-            players[0].reload();
+            player.gun.reload();
         } else if (key == "ArrowRight") { // rotate clockwise
-            players[0].direction += players[0].rotationSpeed;
+            player.updateDirection(player.rotationSpeed);
         } else if (key == "ArrowLeft") { // rotate counter clockwise
-            players[0].direction -= players[0].rotationSpeed;
+            player.updateDirection(-player.rotationSpeed);
         } else if (key == " ") { // space, shoot
-            players[0].tryShoot();
+            player.gun.tryShoot();
         }
     }
 }
 
 function checkPlayerCollision() {
-    for (let p of players) {
-        for (const obj of world_objects) {
-            if (possibleObjectCollision(p.body, obj)) {
-                if (isColliding(p.body, obj, p.dx, p.dy)) {
-                    p.dx *= 0.04;
-                    p.dy *= 0.04;
-                }
-            }
+    for (const obj of worldObjects) {
+        if(checkCollision(player.body, obj, player_dx, player_dy)) {
+            player_dx = player_dy = 0;
+            break;
         }
     }
 }
 
 function updateObjects() {
-    for (obj of world_objects) {
-        obj.move(players[0].dx, players[0].dy);
+    if(player_dx == 0 && player_dy == 0) return;
+    for (obj of worldObjects) {
+        obj.move(-player_dx, -player_dy);
     }
 }
 
 function updateBullets() {
-    for (var p = 0; p < players.length; p++) {
-        for (var i = 0; i < players[p].bullets.length; i++) {
-            let bullet = players[p].bullets.shift();
-            let bulletHit = false;
-            for (const obj of world_objects) {
-                if (possibleObjectCollision(bullet, obj) && isColliding(bullet, obj, 0, 0)) {
-                    bulletHit = true;
-                    break;
-                }
-            }
-            if (bulletHit || outsideCanvas(bullet)) {
-                continue;
-            } else {
-                bullet.move(Math.cos(bullet.direction) * bullet.speed + players[0].dx, Math.sin(bullet.direction) * bullet.speed + players[0].dy);
-                players[p].bullets.push(bullet);
+    let numBullets = worldBullets.length;
+    while(numBullets > 0) {
+        let b = worldBullets.pop();
+        const bullet_dx = Math.cos(b.direction) * b.speed;
+        const bullet_dy = Math.sin(b.direction) * b.speed;
+        b.move(-player_dx, -player_dy);
+        if(outsideCanvas(b)) continue;
+        let collision = false;
+        for(const obj of worldObjects) {
+            if(checkCollision(b, obj, 0, 0)) {
+                collision = true;
+                break;
             }
         }
+        if(collision) continue;
+        b.move(bullet_dx, bullet_dy);
+        worldBullets.unshift(b);
+        numBullets -= 1;
     }
-}
-
-function updatePlayer() {
-    players[0].gun.p2.x = players[0].gun.length * Math.cos(players[0].direction);
-    players[0].gun.p2.y = players[0].gun.length * Math.sin(players[0].direction);
 }
 
 function updateWorld() {
     updateObjects();
     updateBullets();
-    updatePlayer();
 }
 
 function clearCanvas() {
@@ -374,63 +375,61 @@ function clearCanvas() {
 }
 
 function drawWorld() {
-    for (const obj of world_objects) {
+    for (const obj of worldObjects) {
         obj.draw();
+    }
+    for (const b of worldBullets) {
+        b.draw();
     }
 }
 
 function drawPlayers() {
-    for (const player of players) {
-        player.draw();
-    }
-}
-
-function drawBullets() {
-    for (const p of players) {
-        for (const b of p.bullets) {
-            b.draw();
-        }
-    }
+    player.body.draw();
+    player.gun.draw();
 }
 
 function updateBulletCount() {
-    let txt = "Bullets x " + players[0].magCount;
-    if(players[0].magCount > 0) {
+    let txt = "Bullets x " + player.gun.magCount;
+    if(player.magCount > 0) {
         document.getElementById("bullets").innerText = txt;
     } else {
         document.getElementById("bullets").innerText = txt + ("\nRELOAD (r)");
     }
-    
 }
 
 function draw() {
     drawWorld();
     drawPlayers();
-    drawBullets();
 }
 
 function init_world() {
+
     var recta = new Rectangle(150, 150, 40, 20, "red");
     var circa = new Circle(100, -120, 50, "grey");
 
-    world_objects.push(recta);
-    world_objects.push(circa);
-    world_objects.push(new Rectangle(-300, 0, 300, 300, "blue"));
-    players.push(new Player(0, 3, 0.1));
+    worldObjects.push(recta);
+    worldObjects.push(circa);
+    worldObjects.push(new Rectangle(-300, 0, 300, 300, "blue"));
+
+    player = new Player(0, 3, 0.1);
+
+    draw();
 }
 
 function startGame() {
     window.addEventListener("keydown", keydown);
     window.addEventListener("keyup", keyup);
     init_world();
-    gameloop = setInterval(gameLoop, 100 / 6);
+    gameloop = setInterval(gameLoop, 20); // 60 fps
 }
 
 function gameLoop() {
-    positionUpdate();
+    playerUpdate();
     checkPlayerCollision();
     updateWorld();
     clearCanvas();
     updateBulletCount();
     draw();
 }
+
+startGame();
