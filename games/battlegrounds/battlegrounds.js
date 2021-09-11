@@ -158,9 +158,11 @@ class Circle {
 }
 
 class Bullet extends Circle {
-    constructor(x, y, radius, direction, speed, color) {
+    constructor(x, y, dx, dy, radius, direction, speed, color) {
         super(x, y, radius, color);
         this.speed = speed;
+        this.dx = dx;
+        this.dy = dy;
         this.direction = direction;
     }
 }
@@ -196,7 +198,7 @@ class Gun extends Line {
     }
 
     shoot() {
-        worldBullets.push(new Bullet(this.p2.x, this.p2.y, 3, this.direction, 7, "black"));
+        worldBullets.push(new Bullet(this.p2.x, this.p2.y, player_dx, player_dy, 3, this.direction, 7, "black"));
         this.magCount -= 1;
         this.lastShot = performance.now();
     }
@@ -207,6 +209,7 @@ class Player {
         this.direction = direction;
         this.speed = speed;
         this.rotationSpeed = rotationSpeed;
+        this.heading = 0;
         this.body = new Circle(0, 0, 10, "green");
         this.gun = new Gun(0, 0, 15, 0, direction, "red");
     }
@@ -343,11 +346,11 @@ function updateObjects() {
 }
 
 function updateBullets() {
-    let numBullets = worldBullets.length;
-    while(numBullets > 0) {
+    let newBullets = [];
+    while(worldBullets.length > 0) {
         let b = worldBullets.pop();
-        const bullet_dx = Math.cos(b.direction) * b.speed;
-        const bullet_dy = Math.sin(b.direction) * b.speed;
+        const bullet_dx = Math.cos(b.direction) * b.speed + b.dx;
+        const bullet_dy = Math.sin(b.direction) * b.speed + b.dy;
         b.move(-player_dx, -player_dy);
         if(outsideCanvas(b)) continue;
         let collision = false;
@@ -359,9 +362,9 @@ function updateBullets() {
         }
         if(collision) continue;
         b.move(bullet_dx, bullet_dy);
-        worldBullets.unshift(b);
-        numBullets -= 1;
+        newBullets.push(b);
     }
+    worldBullets = newBullets;
 }
 
 function updateWorld() {
