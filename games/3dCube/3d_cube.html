@@ -28,8 +28,10 @@ window.onload = function() {
   cam_max = -4;
   cam_min = -10;
   show_faces = true;
-  document.addEventListener("keydown", pushed_key);
+  window.addEventListener("keydown", keydown);
+  window.addEventListener("keyup", keyup);
   draw();
+  gameInterval = setInterval(tick, 20);
 };
 
 function change() {
@@ -100,43 +102,109 @@ function draw() {
   });
 }
 
-function pushed_key(event) {
+const keys = [
+    { key: "w", pressed: false },
+    { key: "s", pressed: false },
+    { key: "a", pressed: false },
+    { key: "d", pressed: false },
+    { key: "ArrowRight", pressed: false },
+    { key: "ArrowLeft", pressed: false },
+    { key: "ArrowUp", pressed: false },
+    { key: "ArrowDown", pressed: false }
+];
 
-  switch(event.keyCode) {
-    case 38:
-        if(cam_pos < cam_max)
-          cam_pos += 0.1;
-        break;
-    case 40:
-        if(cam_pos > cam_min)
-          cam_pos -= 0.1;
-        break;
+function keydown(e) {
+    switch (e.key) {
+        case "w":
+            keys[0].pressed = true;
+            break;
+        case "s":
+            keys[1].pressed = true;
+            break;
+        case "a":
+            keys[2].pressed = true;
+            break;
+        case "d":
+            keys[3].pressed = true;
+            break;
+        case "ArrowRight":
+            keys[4].pressed = true;
+            break;
+        case "ArrowLeft":
+            keys[5].pressed = true;
+            break;
+        case "ArrowUp":
+            keys[6].pressed = true;
+            break;
+        case "ArrowDown":
+            keys[7].pressed = true;
+            break;
+        default:
+            break;
+    }
+}
 
+function keyup(e) {
+  switch (e.key) {
+        case "w":
+            keys[0].pressed = false;
+            break;
+        case "s":
+            keys[1].pressed = false;
+            break;
+        case "a":
+            keys[2].pressed = false;
+            break;
+        case "d":
+            keys[3].pressed = false;
+            break;
+        case "ArrowRight":
+            keys[4].pressed = false;
+            break;
+        case "ArrowLeft":
+            keys[5].pressed = false;
+            break;
+        case "ArrowUp":
+            keys[6].pressed = false;
+            break;
+        case "ArrowDown":
+            keys[7].pressed = false;
+            break;
+        default:
+            break;
+    }
+}
 
-    case 37:
-        rotate_z(0.05);
-        break;
-    case 39:
-        rotate_z(-0.05);
-        break;
+function handleInput() {
+ for (const k of keys) {
+        if (!k.pressed) {
+            continue;
+        }
+        var key = k.key;
+        if (key == 'w') { // z
+          rotate_z(0.05);
+        } else if (key == 's') { // z
+          rotate_z(-0.05);
+        } else if (key == 'a') { // y
+          rotate_y(0.05);
+        } else if (key == 'd') { // y
+          rotate_y(-0.05);
+        } else if (key == "ArrowLeft") { // x 
+          rotate_x(0.05);
+        } else if (key == "ArrowRight") { // x
+          rotate_x(-0.05);
+        } else if (key == "ArrowUp") { // +
+          if(cam_pos < cam_max) cam_pos += 0.1;
+        } else if (key == "ArrowDown") { // -  
+          if(cam_pos > cam_min) cam_pos -= 0.1;          
+        }
+    }
+}
 
-
-    case 65:
-        rotate_y(0.05);
-        break;
-    case 68:
-        rotate_y(-0.05);
-        break;
-
-
-    case 87:
-        rotate_x(0.05);
-        break;
-    case 83:
-        rotate_x(-0.05);
-        break;
-  }
+function tick() {
+  handleInput();
   draw();
 }
+
 
 </script>
