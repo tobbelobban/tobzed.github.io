@@ -1,4 +1,4 @@
-<canvas id="canvas" width="400" height="400"></canvas>
+<canvas id="canvas" width="600" height="600"></canvas>
 <h1 id="score"> SCORE: 0</h1>
 
 <script>
@@ -14,7 +14,7 @@ var next_lvl = 10;
 var x_vel = 0;
 var y_vel = 0;
 var px_len = 20;
-var tail_length = 5;
+var tail_length = 3;
 var speed = 1000 / 15;
 var tail = [];
 var tile_count = canvas.width / px_len;
@@ -79,8 +79,8 @@ function game() {
     
     var placed_apple = false;
     while(!placed_apple) {
-      apple_x = Math.floor(Math.random()*20);
-      apple_y = Math.floor(Math.random()*20);
+      apple_x = Math.floor(Math.random()*tile_count);
+      apple_y = Math.floor(Math.random()*tile_count);
       placed_apple = true;
       for(var i = 0; i < tail.length; i++) {
         if(apple_x == tail[i].x && apple_y == tail[i].y) {
@@ -88,6 +88,7 @@ function game() {
           break;
         }
       }
+      if(apple_x == head_x && apple_y == head_y) placed_apple = false;
     }
   }
   
