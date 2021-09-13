@@ -8,10 +8,11 @@ let drawBB = false;
 let worldObjects = [];
 let worldBullets = [];
 let animations = [];
+let enemies = [];
 
 let player;
+
 let gameloop;
-let player_dx, player_dy;
 
 function circleCollidingWithRectangle(circle, rect, dx, dy) {
     let hori_dist = Math.abs(circle.center.x - rect.center.x + dx);
@@ -193,14 +194,14 @@ class Gun extends Line {
         this.p2.y = this.length * Math.sin(this.direction);
     }
 
-    tryShoot() {
+    tryShoot(dx, dy) {
         if (performance.now() - this.lastShot > (1000 / this.firerate) && this.isLoaded()) {
-            this.shoot();
+            this.shoot(dx, dy);
         }
     }
 
-    shoot() {
-        worldBullets.push(new Bullet(this.p2.x, this.p2.y, player_dx, player_dy, 3, this.direction, 7, "black"));
+    shoot(dx, dy) {
+        worldBullets.push(new Bullet(this.p2.x, this.p2.y, dx, dy, 3, this.direction, 7, "black"));
         this.magCount -= 1;
         this.lastShot = performance.now();
     }
@@ -233,30 +234,79 @@ class CrossHair {
     }
 }
 
-class Player {
-    constructor(direction, speed, rotationSpeed) {
+class Character {
+    constructor(direction, speed, rotationSpeed, health) {
         this.direction = direction;
         this.speed = speed;
+        this.health  = health;
         this.rotationSpeed = rotationSpeed;
         this.body = new Circle(0, 0, 10, "green");
-        this.gun = new Gun(0, 0, 15, 0, direction, "red");
-        //this.crossHair = new CrossHair(0,0,50,0,this.direction);
+        this.gun = new Gun(0, 0, 20, 0, direction, "red");
     }
 
     rotate(v) {
         this.direction += v;
-    }
-
-    updateDirection(v) {
-        this.rotate(v);
         this.gun.rotate(v);
-        //this.crossHair.rotate(v);
     }
 
     draw() {
         this.body.draw();
-        this.gun.draw();
-        //this.crossHair.draw();
+        this.gun.draw();        
+    }
+}
+
+class Player extends Character {
+    constructor(direction, speed, rotationSpeed, health) {
+        super(direction, speed, rotationSpeed, health);
+        this.dx = 0;
+        this.dy = 0;
+    }
+
+    setDX(new_dx) {
+        this.dx = new_dx;
+    }
+
+    setDY(new_dy) {
+        this.dy = new_dy;
+    }
+    getDX() {
+        return this.dx;
+    }
+
+    getDY() {
+        return this.dy;
+    }
+
+    update() {
+        this.dx = 0;
+        this.dy = 0;
+        for (const k of keys) {
+            if (!k.pressed) {
+                continue;
+            }
+            var key = k.key;
+            if (key == 'w') { // forward
+                this.dx += this.speed * Math.cos(this.direction);
+                this.dy += this.speed * Math.sin(this.direction);
+            } else if (key == 'd') { // right
+                this.dx += this.speed * Math.cos(this.direction + Math.PI / 2);
+                this.dy += this.speed * Math.sin(this.direction + Math.PI / 2);
+            } else if (key == 's') { // backwards
+                this.dx -= this.speed * Math.cos(this.direction);
+                this.dy -= this.speed * Math.sin(this.direction);
+            } else if (key == 'a') { // left
+                this.dx += this.speed * Math.cos(this.direction - Math.PI / 2);
+                this.dy += this.speed * Math.sin(this.direction - Math.PI / 2);
+            } else if (key == "r") { // reload
+                this.gun.reload();
+            } else if (key == "ArrowRight") { // rotate clockwise
+                this.rotate(this.rotationSpeed);
+            } else if (key == "ArrowLeft") { // rotate counter clockwise
+                this.rotate(-this.rotationSpeed);
+            } else if (key == " ") { // space, shoot
+                this.gun.tryShoot(this.dx, this.dy);
+            }
+        }
     }
 }
 
@@ -272,8 +322,8 @@ class ExplosionAnimation {
         return (performance.now() - this.start > this.duration);
     }
 
-    update() {
-        this.shape = new Circle(this.shape.center.x-player_dx, this.shape.center.y-player_dy, this.shape.radius + 1, this.shape.color);
+    update(dx, dy) {
+        this.shape = new Circle(this.shape.center.x - dx, this.shape.center.y -dy, this.shape.radius + 1, this.shape.color);
         if((performance.now() - this.start)/this.duration > 0.7) this.shape.color = "yellow";
     }
 
@@ -355,56 +405,29 @@ function keyup(e) {
     }
 }
 
-function playerUpdate() {
-    player_dx = 0;
-    player_dy = 0;
-    for (const k of keys) {
-        if (!k.pressed) {
-            continue;
-        }
-        var key = k.key;
-        if (key == 'w') { // forward
-            player_dx += player.speed * Math.cos(player.direction);
-            player_dy += player.speed * Math.sin(player.direction);
-        } else if (key == 'd') { // right
-            player_dx += player.speed * Math.cos(player.direction + Math.PI / 2);
-            player_dy += player.speed * Math.sin(player.direction + Math.PI / 2);
-        } else if (key == 's') { // backwards
-            player_dx -= player.speed * Math.cos(player.direction);
-            player_dy -= player.speed * Math.sin(player.direction);
-        } else if (key == 'a') { // left
-            player_dx += player.speed * Math.cos(player.direction - Math.PI / 2);
-            player_dy += player.speed * Math.sin(player.direction - Math.PI / 2);
-        } else if (key == "r") { // reload
-            player.gun.reload();
-        } else if (key == "ArrowRight") { // rotate clockwise
-            player.updateDirection(player.rotationSpeed);
-        } else if (key == "ArrowLeft") { // rotate counter clockwise
-            player.updateDirection(-player.rotationSpeed);
-        } else if (key == " ") { // space, shoot
-            player.gun.tryShoot();
-        }
-    }
-}
-
 function checkPlayerCollision() {
     for (const obj of worldObjects) {
-        if(checkCollision(player.body, obj, player_dx, player_dy)) {
-            player_dx = player_dy = 0;
+        if(checkCollision(player.body, obj, player.getDX(), player.getDY())) {
+            player.setDX(0);
+            player.setDY(0);
             break;
         }
     }
 }
 
 function updateObjects() {
-    if(player_dx == 0 && player_dy == 0) return;
+    const dx = player.getDX();
+    const dy = player.getDY();
+    if(dx == 0 && dy == 0) return;
     for (obj of worldObjects) {
-        obj.move(-player_dx, -player_dy);
+        obj.move(-dx, -dy);
     }
 }
 
 function updateBullets() {
     let newBullets = [];
+    const player_dx = player.getDX();
+    const player_dy = player.getDY();
     while(worldBullets.length > 0) {
         let b = worldBullets.pop();
         const bullet_dx = Math.cos(b.direction) * b.speed + b.dx;
@@ -428,12 +451,14 @@ function updateBullets() {
 
 function updateAnimations() {
     let newAnimations = [];
+    const player_dx = player.getDX();
+    const player_dy = player.getDY();
     while(animations.length > 0) {
         let a = animations.pop();
         if(a.isDone()) {
             continue;
         }
-        a.update();
+        a.update(player_dx, player_dy);
         newAnimations.push(a);
     }
     animations = newAnimations;
@@ -450,6 +475,8 @@ function clearCanvas() {
     ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 }
 
+
+
 function drawWorld() {
     for (const obj of worldObjects) {
         obj.draw();
@@ -460,10 +487,10 @@ function drawWorld() {
     for (const a of animations) {
         a.shape.draw();
     }
-}
 
-function drawPlayers() {
     player.draw();
+
+    for(const p of enemies) p.draw();
 }
 
 function updateBulletCount() {
@@ -475,11 +502,6 @@ function updateBulletCount() {
     }
 }
 
-function draw() {
-    drawWorld();
-    drawPlayers();
-}
-
 function init_world() {
 
     var recta = new Rectangle(150, 150, 40, 20, "red");
@@ -489,25 +511,25 @@ function init_world() {
     worldObjects.push(circa);
     worldObjects.push(new Rectangle(-300, 0, 300, 300, "blue"));
 
-    player = new Player(0, 3, 0.1);
-    draw();
+    player = new Player(0, 3, 0.1, 100);
+    drawWorld();
 }
 
 function startGame() {
     window.addEventListener("keydown", keydown);
     window.addEventListener("keyup", keyup);
     init_world();
-    gameloop = setInterval(gameLoop, 20); // 60 fps
+    gameloop = setInterval(gameLoop, 20); // // set game update frequency
    
 }
 
 function gameLoop() {
-    playerUpdate();
+    player.update();
     checkPlayerCollision();
     updateWorld();
     clearCanvas();
     updateBulletCount();
-    draw();
+    drawWorld();
 }
 
 startGame();
