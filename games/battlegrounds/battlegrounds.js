@@ -7,6 +7,8 @@ let drawBB = false;
 
 let worldObjects = [];
 let worldBullets = [];
+let animations = [];
+
 let player;
 let gameloop;
 let player_dx, player_dy;
@@ -204,14 +206,41 @@ class Gun extends Line {
     }
 }
 
+class CrossHair {
+    constructor(x1, y1, x2, y2, direction) {
+        this.direction = direction;
+        this.body = new Circle(x2, y2, 5, "red");
+        this.line = new Line(x1, y1, x2, y2, "red");
+    }
+
+    rotate(v) {
+        this.direction += v;
+        let new_x = this.line.length * Math.cos(this.direction);
+        let new_y = this.line.length * Math.sin(this.direction);
+        this.body.move(new_x - this.body.center.x, new_y - this.body.center.y);
+        this.line.p2.x = new_x;
+        this.line.p2.y = new_y;
+    }
+
+    move(dx, dy) {
+        this.line.move(dx,dy);
+        this.body.move(dx,dy);
+    }
+
+    draw() {
+        this.line.draw();
+        this.body.draw();
+    }
+}
+
 class Player {
     constructor(direction, speed, rotationSpeed) {
         this.direction = direction;
         this.speed = speed;
         this.rotationSpeed = rotationSpeed;
-        this.heading = 0;
         this.body = new Circle(0, 0, 10, "green");
         this.gun = new Gun(0, 0, 15, 0, direction, "red");
+        //this.crossHair = new CrossHair(0,0,50,0,this.direction);
     }
 
     rotate(v) {
@@ -221,6 +250,35 @@ class Player {
     updateDirection(v) {
         this.rotate(v);
         this.gun.rotate(v);
+        //this.crossHair.rotate(v);
+    }
+
+    draw() {
+        this.body.draw();
+        this.gun.draw();
+        //this.crossHair.draw();
+    }
+}
+
+class ExplosionAnimation {
+    constructor(x, y, duration, speed) {
+        this.shape = new Circle(x,y,2,"red");
+        this.duration = duration;
+        this.growSpeed = speed;
+        this.start = performance.now();
+    }
+
+    isDone() {        
+        return (performance.now() - this.start > this.duration);
+    }
+
+    update() {
+        this.shape = new Circle(this.shape.center.x-player_dx, this.shape.center.y-player_dy, this.shape.radius + 1, this.shape.color);
+        if((performance.now() - this.start)/this.duration > 0.7) this.shape.color = "yellow";
+    }
+
+    draw() {
+        this.shape.draw();
     }
 }
 
@@ -356,6 +414,7 @@ function updateBullets() {
         let collision = false;
         for(const obj of worldObjects) {
             if(checkCollision(b, obj, 0, 0)) {
+                animations.push(new ExplosionAnimation(b.center.x, b.center.y, 200, 1));
                 collision = true;
                 break;
             }
@@ -367,9 +426,23 @@ function updateBullets() {
     worldBullets = newBullets;
 }
 
+function updateAnimations() {
+    let newAnimations = [];
+    while(animations.length > 0) {
+        let a = animations.pop();
+        if(a.isDone()) {
+            continue;
+        }
+        a.update();
+        newAnimations.push(a);
+    }
+    animations = newAnimations;
+}
+
 function updateWorld() {
     updateObjects();
     updateBullets();
+    updateAnimations();
 }
 
 function clearCanvas() {
@@ -384,11 +457,13 @@ function drawWorld() {
     for (const b of worldBullets) {
         b.draw();
     }
+    for (const a of animations) {
+        a.shape.draw();
+    }
 }
 
 function drawPlayers() {
-    player.body.draw();
-    player.gun.draw();
+    player.draw();
 }
 
 function updateBulletCount() {
@@ -415,7 +490,6 @@ function init_world() {
     worldObjects.push(new Rectangle(-300, 0, 300, 300, "blue"));
 
     player = new Player(0, 3, 0.1);
-
     draw();
 }
 
@@ -424,6 +498,7 @@ function startGame() {
     window.addEventListener("keyup", keyup);
     init_world();
     gameloop = setInterval(gameLoop, 20); // 60 fps
+   
 }
 
 function gameLoop() {
