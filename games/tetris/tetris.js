@@ -19,7 +19,7 @@ var tiles = {
         for(var i = 0; i < 10; i++) {
             for(var j = 0; j < 21; j++) {
                 j == 20 ? tiles.board[i][j] = new tile("white", true) :
-                tiles.board[i][j] = new tile("white", false);
+                tiles.board[i][j] = new tile("grey", false);
             }
         }
     }
@@ -68,21 +68,21 @@ function tile(color, value) {
 }
 
 function selectPiece() {
-    var id = Math.floor(Math.random()*7) + 1;
+    var id = Math.floor(Math.random()*7);
     switch (id) {
-        case 1:
+        case 0:
         return "line";
-        case 2:
+        case 1:
         return "square";
-        case 3:
+        case 2:
         return "rightSnake";
-        case 4:
+        case 3:
         return "leftSnake";
-        case 5:
+        case 4:
         return "pyramid";
-        case 6:
+        case 5:
         return "rightL";
-        case 7:
+        case 6:
         return "leftL";
         default:
     }
@@ -220,8 +220,7 @@ function piece(x, y, type) {
         ctx.fillRect(this.x2*30, this.y2*30, 30, 30);
         ctx.fillRect(this.x3*30, this.y3*30, 30, 30);
         ctx.fillRect(this.x4*30, this.y4*30, 30, 30);
-
-        ctx.strokeStyle = "black";
+        ctx.strokeStyle = "grey";
         ctx.strokeRect(this.x*30, this.y*30, 30, 30);
         ctx.strokeRect(this.x2*30, this.y2*30, 30, 30);
         ctx.strokeRect(this.x3*30, this.y3*30, 30, 30);
@@ -330,14 +329,14 @@ function clearLines(fromLine) {
         if(lineDone) {
             for(var x = 0; x < 10; x++) {
                 tiles.board[x][y].value = false;
-                tiles.board[x][y].color = "white";
+                tiles.board[x][y].color = "grey";
             }
             lineCount+=1;
         } else if (lineCount > 0) {
             for(var x = 0; x < 10; x++) {
                 if(tiles.board[x][y].value) {
                     tiles.board[x][y+lineCount].color = tiles.board[x][y].color;
-                    tiles.board[x][y].color = "white";
+                    tiles.board[x][y].color = "grey";
                     tiles.board[x][y].value = false;
                     tiles.board[x][y+lineCount].value = true;
                 }
@@ -375,7 +374,7 @@ function newPiece() {
 }
 
 function movePlayer() {
-    ctx.fillStyle = "white";
+    ctx.fillStyle = "grey";
     ctx.fillRect(player.oldx*30, player.oldy*30, 30, 30);
     ctx.fillRect(player.oldx2*30, player.oldy2*30, 30, 30);
     ctx.fillRect(player.oldx3*30, player.oldy3*30, 30, 30);
